@@ -3,52 +3,124 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Parent Dashboard</title>
+<title>Uday Parent Dashboard</title>
 <script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-body { background: linear-gradient(135deg,#0a0a0a,#1e003e,#001a33); color:#fff; font-family:sans-serif; }
-.toast { position: fixed; bottom: 20px; right: 20px; background:#7f00ff; padding:10px 20px; border-radius:8px; opacity:0; transform:translateY(20px); transition:all 0.3s; z-index:1000;}
+body { 
+  background: linear-gradient(135deg,#0a0a0a,#1e003e,#001a33); 
+  color:#fff; 
+  font-family:sans-serif; 
+}
+.toast { 
+  position: fixed; 
+  bottom: 20px; 
+  right: 20px; 
+  background:#7f00ff; 
+  padding:10px 20px; 
+  border-radius:8px; 
+  opacity:0; 
+  transform:translateY(20px); 
+  transition:all 0.3s; 
+  z-index:1000;
+  box-shadow: 0 0 10px rgba(127, 0, 255, 0.7);
+}
 .toast.show { opacity:1; transform:translateY(0);}
+.card {
+  background: #1e003e; 
+  border: 1px solid #7f00ff; 
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 0 15px rgba(127, 0, 255, 0.5); 
+}
+.notification-item {
+    background: #0d0d2b; /* Darker background for notification */
+}
+.notification-read {
+    opacity: 0.6;
+    background: #1e003e;
+    text-decoration: line-through;
+}
 </style>
 </head>
 <body class="min-h-screen p-6">
 
-<h1 class="text-3xl font-bold mb-6 text-purple-400">Parent Dashboard</h1>
+<h1 class="text-4xl font-extrabold mb-8 text-purple-400 text-center flex items-center justify-center gap-3">
+    <i class="fas fa-user-friends"></i> Uday Parent Dashboard
+</h1>
 
-<!-- Select Student -->
-<div class="mb-6">
-  <input type="text" id="parentStudentInput" placeholder="Enter your child’s name" class="p-2 rounded bg-gray-700 text-white w-full">
-  <button onclick="loadChildData()" class="mt-2 w-full bg-purple-600 hover:bg-purple-700 p-2 rounded">Load Student</button>
+<div class="mb-10 max-w-md mx-auto p-4 card">
+    <label for="parentStudentInput" class="block text-gray-300 font-semibold mb-2">Child’s Name</label>
+    <input type="text" id="parentStudentInput" placeholder="Enter your child’s name (e.g., Alice)" class="p-3 rounded bg-gray-700 text-white w-full border border-purple-600 focus:ring-2 focus:ring-purple-500">
+    <button onclick="loadChildData()" class="mt-3 w-full bg-purple-600 hover:bg-purple-700 p-3 rounded font-bold transition flex items-center justify-center gap-2">
+        <i class="fas fa-search"></i> Load Student Data
+    </button>
 </div>
 
-<!-- Student Performance -->
-<section class="mb-6 bg-gray-800 p-4 rounded-xl shadow-lg">
-  <h2 class="text-2xl font-bold text-green-300 mb-2">Student Performance</h2>
-  <div id="childInfo" class="mb-2"></div>
-  <canvas id="childChart" height="200"></canvas>
-</section>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+    <section class="card">
+      <h2 class="text-2xl font-bold text-green-300 mb-4"><i class="fas fa-chart-line"></i> Performance Overview</h2>
+      <div id="childInfo" class="mb-4 space-y-2 text-lg">
+          <p class="text-gray-400">Load your child's data to view performance.</p>
+      </div>
+      <canvas id="childChart" height="200"></canvas>
+    </section>
 
-<!-- Book Session -->
-<section class="mb-6 bg-gray-800 p-4 rounded-xl shadow-lg">
-  <h2 class="text-2xl font-bold text-blue-300 mb-2">Book a Session</h2>
-  <select id="sessionSelect" class="w-full p-2 rounded bg-gray-700 text-white mb-2">
-    <option value="">Select Session</option>
-  </select>
-  <button onclick="bookSession()" class="w-full bg-purple-600 hover:bg-purple-700 p-2 rounded">Book Session</button>
-</section>
+    <div>
+        <section class="card mb-6">
+          <h2 class="text-2xl font-bold text-blue-300 mb-4"><i class="fas fa-handshake"></i> Book Consultation</h2>
+          <select id="sessionSelect" class="w-full p-3 rounded bg-gray-700 text-white mb-3 border border-blue-500">
+            <option value="">Select a Teacher/Counselor Session</option>
+          </select>
+          <button onclick="bookSession()" class="w-full bg-blue-600 hover:bg-blue-700 p-3 rounded font-bold transition flex items-center justify-center gap-2">
+            <i class="fas fa-calendar-check"></i> Request Booking
+          </button>
+        </section>
 
-<!-- Notifications -->
-<section class="bg-gray-800 p-4 rounded-xl shadow-lg">
-  <h2 class="text-2xl font-bold text-yellow-300 mb-2">Notifications</h2>
-  <ul id="notificationList" class="list-disc pl-5"></ul>
-</section>
+        <section class="card">
+          <h2 class="text-2xl font-bold text-yellow-300 mb-4"><i class="fas fa-bell"></i> Notifications</h2>
+          <ul id="notificationList" class="list-none space-y-2">
+            </ul>
+        </section>
+    </div>
+</div>
 
-<!-- Toast -->
 <div id="toastContainer"></div>
 
 <script>
-// Toast
+// --- Mock Data Setup ---
+localStorage.clear(); // Ensure a clean mock environment
+
+// Note: Added AttendanceScore (percentage) for direct display
+const MOCK_EXCEL_DATA = [
+  {Name:"Alice",Class:"10th",Marks:88,FeesStatus:"Paid", AttendanceScore: 85}, // 85% attendance
+  {Name:"Bob",Class:"10th",Marks:76,FeesStatus:"Unpaid", AttendanceScore: 68}, // 68% attendance (low risk)
+  {Name:"Charlie",Class:"11th",Marks:92,FeesStatus:"Paid", AttendanceScore: 95}, // 95% attendance
+  {Name:"Uday",Class:"12th",Marks:99,FeesStatus:"Paid", AttendanceScore: 99} // 99% attendance
+];
+
+const MOCK_SESSIONS = ["Teacher Alice (Mon 10am)","Counselor Bob (Tue 2pm)","Admin Charlie (Wed 4pm)"];
+
+// Store the mock data
+localStorage.setItem("excelData",JSON.stringify(MOCK_EXCEL_DATA));
+localStorage.setItem("consultSessions",JSON.stringify(MOCK_SESSIONS)); 
+
+// Store mock notifications in localStorage for persistence and manipulation
+const MOCK_NOTIFICATIONS = [
+    { id: 1, text: "Parent-teacher meeting on **Friday at 3 PM**. Please confirm attendance.", icon: "fas fa-calendar-alt", color: "text-red-400", read: false },
+    { id: 2, text: "Your child's **Attendance is below 80%** (Bob only). Please check the details.", icon: "fas fa-exclamation-triangle", color: "text-yellow-400", read: false },
+    { id: 3, text: "New **counseling sessions** added by the administration.", icon: "fas fa-plus-circle", color: "text-blue-400", read: true } // Example read notification
+];
+localStorage.setItem("notifications", JSON.stringify(MOCK_NOTIFICATIONS));
+
+// --- Global Variables ---
+let childData = null;
+let childChart = null;
+const totalSessionsPossible = 100; // Total sessions assumed for calculating raw attendance count from percentage
+
+// --- Utility Functions ---
+
 function showToast(msg){
   const toast=document.createElement("div");
   toast.className="toast show text-white";
@@ -57,82 +129,141 @@ function showToast(msg){
   setTimeout(()=>toast.remove(),3000);
 }
 
-// Load Student Data
-let childData=null;
-function loadChildData(){
-  const name=document.getElementById("parentStudentInput").value.trim();
-  if(!name){ alert("Enter student name"); return; }
-  const excelData=JSON.parse(localStorage.getItem("excelData"))||[];
-  childData=excelData.find(s=>s.Name.toLowerCase()===name.toLowerCase());
-  if(!childData){ alert("Student not found"); return; }
-
-  // Load sessions
-  const sessionSelect=document.getElementById("sessionSelect");
-  sessionSelect.innerHTML='<option value="">Select Session</option>';
-  const sessions=JSON.parse(localStorage.getItem("sessions"))||[];
-  sessions.forEach(s=>{ const opt=document.createElement("option"); opt.value=s; opt.innerText=s; sessionSelect.appendChild(opt); });
-
-  displayChildInfo();
+function loadSessionOptions() {
+    const sessionSelect = document.getElementById("sessionSelect");
+    sessionSelect.innerHTML = '<option value="">Select a Teacher/Counselor Session</option>';
+    const sessions = JSON.parse(localStorage.getItem("consultSessions")) || [];
+    sessions.forEach(s => { 
+        const opt = document.createElement("option"); 
+        opt.value = s; 
+        opt.innerText = s; 
+        sessionSelect.appendChild(opt); 
+    });
 }
 
-// Display child performance
-let childChart=null;
+// --- Dashboard Functions ---
+
+function loadChildData(){
+  const name=document.getElementById("parentStudentInput").value.trim();
+  if(!name){ showToast("Enter your child's name!"); return; }
+  
+  const excelData=JSON.parse(localStorage.getItem("excelData"))||[];
+  childData=excelData.find(s=>s.Name.toLowerCase()===name.toLowerCase());
+  
+  if(!childData){ 
+    document.getElementById("childInfo").innerHTML = `<p class="text-red-400">Student "${name}" not found. Try Alice, Bob, Charlie, or Uday.</p>`;
+    showToast("Student not found!");
+    if(childChart) childChart.destroy();
+    return; 
+  }
+
+  displayChildInfo();
+  showToast(`Data loaded for ${childData.Name}!`);
+}
+
 function displayChildInfo(){
   if(!childData) return;
-  const attendanceData=JSON.parse(localStorage.getItem("attendance"))||[];
-  const totalAttendance=attendanceData.filter(a=>a.student===childData.Name).length;
+  
+  const attendancePercent = childData.AttendanceScore || 0;
+  // Convert percentage back to an assumed count for a more realistic display
+  const attendedCount = Math.round((attendancePercent / 100) * totalSessionsPossible);
+
+  const feesStatus = childData.FeesStatus || 'N/A';
+  const feesColor = feesStatus.toLowerCase() === 'paid' ? 'text-green-400' : 'text-red-400';
 
   document.getElementById("childInfo").innerHTML=`
-    <p><strong>Name:</strong> ${childData.Name}</p>
-    <p><strong>Class:</strong> ${childData.Class || 'N/A'}</p>
-    <p><strong>Attendance:</strong> ${totalAttendance}</p>
-    <p><strong>Marks:</strong> ${childData.Marks || 'N/A'}</p>
-    <p><strong>Fees Status:</strong> ${childData.FeesStatus || 'N/A'}</p>
+    <p><strong><i class="fas fa-user"></i> Name:</strong> ${childData.Name}</p>
+    <p><strong><i class="fas fa-graduation-cap"></i> Class:</strong> ${childData.Class || 'N/A'}</p>
+    <p><strong><i class="fas fa-check-circle"></i> Attendance:</strong> ${attendedCount} / ${totalSessionsPossible} (${attendancePercent}%)</p>
+    <p><strong><i class="fas fa-star"></i> Marks:</strong> ${childData.Marks || 'N/A'} / 100</p>
+    <p><strong><i class="fas fa-rupee-sign"></i> Fees Status:</strong> <span class="${feesColor}">${feesStatus}</span></p>
   `;
 
-  const paid=(childData.FeesStatus?.toLowerCase()==='paid')?1:0;
-  const unpaid=(childData.FeesStatus?.toLowerCase()!=='paid')?1:0;
+  // Chart data
+  const paid = (feesStatus.toLowerCase() === 'paid') ? 100 : 0;
+  const marks = childData.Marks || 0;
 
   if(childChart) childChart.destroy();
   const ctx=document.getElementById("childChart").getContext("2d");
   childChart=new Chart(ctx,{
-    type:'pie',
+    type:'doughnut',
     data:{
-      labels:['Attendance','Marks','Fees Paid','Fees Not Paid'],
-      datasets:[{data:[totalAttendance,childData.Marks||0,paid,unpaid],backgroundColor:['#7f00ff','#00bfff','#00ff7f','#ff1a75']}]
+      labels:['Attendance (%)','Marks (Out of 100)','Fees Paid Status'],
+      datasets:[{
+        data:[parseFloat(attendancePercent), marks, paid],
+        backgroundColor:['#7f00ff','#00bfff','#00ff7f'],
+        borderWidth: 1
+      }]
     },
-    options:{responsive:true}
+    options:{
+        responsive:true,
+        plugins:{
+            legend:{ position:'bottom', labels: { color: '#fff' } },
+            title: { display: true, text: `${childData.Name}'s Metric Breakdown`, color: '#fff' }
+        }
+    }
   });
 }
 
-// Book session
 function bookSession(){
-  if(!childData){ alert("Load student first"); return; }
+  if(!childData){ showToast("Please load your child's data first!"); return; }
   const session=document.getElementById("sessionSelect").value;
-  if(!session){ alert("Select a session"); return; }
+  if(!session){ showToast("Select a session to book!"); return; }
+  
   let bookings=JSON.parse(localStorage.getItem("bookings"))||[];
-  bookings.push({student:childData.Name,session,date:new Date().toLocaleString()});
+  const bookingDetails = {
+      student: childData.Name,
+      parent: document.getElementById("parentStudentInput").value.trim(),
+      session: session,
+      date: new Date().toLocaleDateString(),
+      time: new Date().toLocaleTimeString()
+  };
+  bookings.push(bookingDetails);
   localStorage.setItem("bookings",JSON.stringify(bookings));
-  showToast(`Session "${session}" booked successfully!`);
+  showToast(`Session with ${session.split('(')[0].trim()} booked successfully! You will be contacted soon.`);
 }
 
-// Show notifications
+function markNotificationAsRead(id) {
+    let notifications = JSON.parse(localStorage.getItem("notifications")) || [];
+    const index = notifications.findIndex(n => n.id === id);
+    if (index !== -1) {
+        notifications[index].read = true;
+        localStorage.setItem("notifications", JSON.stringify(notifications));
+        loadNotifications(); // Reload list to update UI
+        showToast("Notification dismissed!");
+    }
+}
+
 function loadNotifications(){
-  const notifications=[
-    "Parent-teacher meeting on Friday",
-    "School will be closed next Monday",
-    "New session added by teacher"
-  ];
+  const notifications = JSON.parse(localStorage.getItem("notifications")) || [];
   const ul=document.getElementById("notificationList");
   ul.innerHTML="";
+  
   notifications.forEach(n=>{
     const li=document.createElement("li");
-    li.innerText=n;
+    const readClass = n.read ? 'notification-read' : 'notification-item';
+    
+    li.className = `${readClass} flex flex-col items-start gap-2 p-3 rounded transition`;
+    
+    li.innerHTML = `
+        <div class="flex items-start w-full">
+            <i class="${n.icon} ${n.color} text-xl mt-1"></i> 
+            <span class="flex-1 ml-3">${n.text}</span>
+            <button onclick="markNotificationAsRead(${n.id})" class="text-sm text-gray-400 hover:text-red-400 ml-2 p-1 rounded transition">
+                <i class="fas fa-check-circle"></i>
+            </button>
+        </div>
+        ${!n.read ? `<span class="text-xs text-yellow-500 ml-7">Action required!</span>` : `<span class="text-xs text-gray-500 ml-7">Read</span>`}
+    `;
     ul.appendChild(li);
   });
 }
 
-loadNotifications();
+// Initial load
+document.addEventListener('DOMContentLoaded', () => {
+    loadNotifications();
+    loadSessionOptions();
+});
 </script>
 
 </body>

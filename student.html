@@ -3,182 +3,598 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Student Dashboard</title>
+<title>Uday Student Dashboard</title>
 <script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-body { background: linear-gradient(135deg,#0a0a0a,#1e003e,#001a33); color:#fff; font-family:sans-serif; }
-.chat-widget { position: fixed; bottom: 20px; right: 20px; width: 320px; max-height: 400px; border: 2px solid #7f00ff; border-radius: 12px; overflow: hidden; background:#1e003e; display:flex; flex-direction:column; box-shadow:0 0 20px #7f00ff; z-index:1000; }
-.chat-header { background:#7f00ff; padding:10px; text-align:center; font-weight:bold; border-bottom:1px solid #fff; cursor:pointer; }
-.chat-box { flex:1; padding:10px; overflow-y:auto; }
-.chat-input-container { display:flex; border-top:1px solid #7f00ff; }
-.chat-input { flex:1; padding:10px; border:none; outline:none; background:#0d0d2b; color:#fff; }
-.chat-send-btn { padding:10px 15px; background:#00bfff; border:none; cursor:pointer; }
-.message { margin:5px 0; padding:5px 10px; border-radius:12px; max-width:80%; word-wrap:break-word; }
-.user { background:#7f00ff; text-align:right; margin-left:auto; }
-.bot { background:#00bfff; text-align:left; margin-right:auto; }
+body {
+  background: linear-gradient(135deg,#0a0a0a,#1e003e,#001a33);
+  color:#fff;
+  font-family:sans-serif;
+}
+/* Refined Card Style */
+.card {
+  background: #1e003e; /* Dark Purple Background */
+  border: 1px solid #7f00ff; /* Bright Purple Border */
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 0 15px rgba(127, 0, 255, 0.5); /* Glowing Shadow */
+}
+
+/* Chat Widget Styling and Positioning (FIXED) */
+.chat-widget {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 340px;
+  max-height: 450px; /* Max height when expanded */
+  height: 50px; /* Initial height (collapsed) */
+  border: 2px solid #7f00ff;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #1e003e;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0 25px rgba(127, 0, 255, 0.7);
+  z-index: 1000;
+  transition: height 0.3s ease-in-out; /* Smooth toggle animation */
+}
+.chat-widget.expanded {
+    height: 450px;
+}
+.chat-header {
+  background: #7f00ff;
+  padding: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0; /* Prevent header from shrinking */
+}
+.chat-box {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+  display: none; /* Controlled by JS now */
+}
+.chat-input-container {
+  display: none; /* Controlled by JS now */
+  border-top: 1px solid #7f00ff;
+  flex-shrink: 0;
+}
+.chat-input {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  outline: none;
+  background: #0d0d2b;
+  color: #fff;
+}
+.chat-send-btn {
+  padding: 10px 15px;
+  background: #00bfff;
+  border: none;
+  cursor: pointer;
+}
+.message {
+  margin: 5px 0;
+  padding: 8px 12px;
+  border-radius: 16px;
+  max-width: 80%;
+  word-wrap: break-word;
+}
+.user { background: #7f00ff; text-align: right; margin-left: auto; }
+.bot { background: #00bfff; text-align: left; margin-right: auto; }
+
+/* Responsive dashboard grid */
+.dashboard-grid {
+  display:grid;
+  grid-template-columns: repeat(auto-fit,minmax(300px,1fr));
+  gap:20px;
+}
 </style>
 </head>
 <body class="min-h-screen p-6">
 
-<h1 class="text-3xl font-bold mb-6 text-purple-400">Student Dashboard</h1>
+<h1 id="mainTitle" class="text-4xl font-extrabold mb-8 text-purple-400 text-center flex items-center justify-center gap-3">
+    <i class="fas fa-user-graduate"></i> Student Dashboard
+</h1>
 
-<!-- Select Student -->
-<div class="mb-4">
-  <input type="text" id="studentNameInput" placeholder="Enter your name" class="p-2 rounded bg-gray-700 text-white w-full">
-  <button onclick="loadStudentData()" class="mt-2 w-full bg-purple-600 hover:bg-purple-700 p-2 rounded">Load My Data</button>
+<div class="mb-4 max-w-lg mx-auto flex justify-end">
+    <select id="languageSelect" class="p-2 rounded bg-gray-700 text-white border border-purple-600">
+        <option value="eng">English</option>
+        <option value="hin">हिन्दी (Hindi)</option>
+        <option value="kan">ಕನ್ನಡ (Kannada)</option>
+        <option value="mar">मारवाड़ी (Marwari)</option>
+    </select>
 </div>
 
-<!-- Sessions -->
-<section class="mb-6 bg-gray-800 p-4 rounded-xl shadow-lg">
-  <h2 class="text-2xl font-bold text-blue-300 mb-2">My Sessions</h2>
-  <select id="sessionSelect" class="w-full p-2 rounded bg-gray-700 text-white mb-2">
-    <option value="">Select Session</option>
-  </select>
-</section>
+<div class="mb-10 max-w-md mx-auto p-4 card">
+  <label for="studentNameInput" id="labelNameInput" class="block text-gray-300 font-semibold mb-2">Enter Your Name to Load Data</label>
+  <input type="text" id="studentNameInput" placeholder="e.g., Alice" class="p-3 rounded bg-gray-700 text-white w-full border border-purple-600 focus:ring-2 focus:ring-purple-500">
+  <button onclick="loadStudentData()" id="loadDataBtn" class="mt-3 w-full bg-purple-600 hover:bg-purple-700 p-3 rounded font-bold transition flex items-center justify-center gap-2">
+    <i class="fas fa-database"></i> Load My Data
+  </button>
+</div>
 
-<!-- Student Data -->
-<section class="mb-6 bg-gray-800 p-4 rounded-xl shadow-lg">
-  <h2 class="text-2xl font-bold text-green-300 mb-2">My Data</h2>
-  <div id="studentInfo" class="mb-2"></div>
-  <canvas id="studentChart" height="200"></canvas>
-</section>
+<div class="dashboard-grid mb-6">
+  <div class="card">
+    <h2 id="sessionsTitle" class="text-xl font-bold text-blue-300 mb-4"><i class="fas fa-calendar-alt"></i> My Sessions</h2>
+    <p id="sessionsFilterText" class="text-sm text-gray-400 mb-2">Filter data by session:</p>
+    <select id="sessionSelect" class="w-full p-2 rounded bg-gray-700 text-white border border-blue-500">
+      <option id="selectSessionOption" value="">Select Session</option>
+    </select>
+  </div>
 
-<!-- Floating Chatbot -->
+  <div class="card">
+    <h2 id="dataTitle" class="text-xl font-bold text-green-300 mb-4"><i class="fas fa-id-card"></i> My Data</h2>
+    <div id="studentInfo" class="space-y-2 text-lg">
+        <p id="dataPlaceholder" class="text-gray-400">Data will appear here after loading.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 id="chartTitle" class="text-xl font-bold text-yellow-300 mb-4"><i class="fas fa-chart-bar"></i> Performance Chart</h2>
+    <canvas id="studentChart" height="200"></canvas>
+  </div>
+</div>
+
 <div class="chat-widget" id="chatWidget">
-  <div class="chat-header" onclick="toggleChat()">💬 Chatbot</div>
+  <div class="chat-header" onclick="toggleChat()">
+    <span id="chatHeaderTitle" class="text-white">💬 Uday Assistant</span>
+    <span id="chatToggle" class="cursor-pointer text-white">+</span>
+  </div>
   <div class="chat-box" id="chatBox"></div>
   <div class="chat-input-container">
     <input type="text" id="chatInput" class="chat-input" placeholder="Type your message...">
-    <button class="chat-send-btn" onclick="sendMessage()">Send</button>
+    <button class="chat-send-btn text-white font-semibold" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
   </div>
 </div>
 
 <script>
-// Load sessions and data from localStorage
-let studentData=null;
+// --- Translations ---
+const langData = {
+    eng: {
+        mainTitle: "Student Dashboard",
+        loadNameLabel: "Enter Your Name to Load Data",
+        namePlaceholder: "e.g., Alice",
+        loadDataBtn: "Load My Data",
+        sessionsTitle: "My Sessions",
+        sessionsFilterText: "Filter data by session:",
+        selectSessionOption: "Select Session",
+        dataTitle: "My Data",
+        dataPlaceholder: "Data will appear here after loading.",
+        chartTitle: "Performance Chart",
+        chatHeaderTitle: "💬 Uday Assistant",
+        chatInputPlaceholder: "Type your message...",
+        // Data Labels
+        labelName: "Name:",
+        labelClass: "Class:",
+        labelAttendance: "Attendance:",
+        labelMarks: "Marks:",
+        labelFeesStatus: "Fees Status:",
+        // Chart Labels
+        chartLabelAttendance: "Attendance (%)",
+        chartLabelMarks: "Marks (Out of 100)",
+        chartLabelFeesStatus: "Fees Paid Status",
+        chartTitleText: "Overall Performance Breakdown",
+        // Chat Responses
+        chatHello: (name) => `Hello ${name}! I am your dashboard assistant. Ask me about attendance, marks, fees, sessions, or tips!`,
+        chatNotLoaded: "Please load your data first by entering your name and clicking 'Load My Data'!",
+        chatNotFound: (name) => `Student "${name}" not found. Try Alice, Bob, Charlie, or Uday.`,
+        chatAttendance: (count, total, percent) => `Your total attendance is **${count}** out of **${total}** sessions, which is **${percent}%**. Keep up the great work!`,
+        chatMarks: (marks) => `Your marks are **${marks || 'N/A'}** out of 100.`,
+        chatFeesPaid: "Fees are all clear! 👍",
+        chatFeesUnpaid: "Please check with the college office to clear any pending fees.",
+        chatFeesStatus: (status) => `Your fees status is: **${status || 'N/A'}**.`,
+        chatSessions: (length) => `Your total sessions are **${length}**. You can see the full list in the 'My Sessions' filter.`,
+        chatNoSessions: "No sessions available yet.",
+        chatRisk: (risk, marks) => `Based on your metrics (Marks: ${marks}), your current estimated dropout risk is approximately **${risk}%**. Focus on improving attendance and grades to lower this!`,
+        chatDefault: "I'm not sure. Try asking me about **attendance**, **marks**, **fees**, **sessions**, or **tips**.",
+        chatTips: ["Attend all sessions regularly! Your presence matters.", "Review your notes daily to reinforce learning.", "Clear doubts with your teacher promptly—don't wait!", "Pay your fees on time to avoid administrative issues.", "Use the dashboard to track your performance weekly."],
+    },
+    hin: {
+        mainTitle: "छात्र डैशबोर्ड",
+        loadNameLabel: "डेटा लोड करने के लिए अपना नाम दर्ज करें",
+        namePlaceholder: "उदा. एलिस",
+        loadDataBtn: "मेरा डेटा लोड करें",
+        sessionsTitle: "मेरे सत्र",
+        sessionsFilterText: "सत्र के अनुसार डेटा फ़िल्टर करें:",
+        selectSessionOption: "सत्र चुनें",
+        dataTitle: "मेरा डेटा",
+        dataPlaceholder: "डेटा लोड होने के बाद यहां दिखाई देगा।",
+        chartTitle: "प्रदर्शन चार्ट",
+        chatHeaderTitle: "💬 उदय सहायक",
+        chatInputPlaceholder: "अपना संदेश लिखें...",
+        // Data Labels
+        labelName: "नाम:",
+        labelClass: "कक्षा:",
+        labelAttendance: "उपस्थिति:",
+        labelMarks: "अंक:",
+        labelFeesStatus: "शुल्क स्थिति:",
+        // Chart Labels
+        chartLabelAttendance: "उपस्थिति (%)",
+        chartLabelMarks: "अंक (100 में से)",
+        chartLabelFeesStatus: "शुल्क भुगतान स्थिति",
+        chartTitleText: "समग्र प्रदर्शन ब्रेकडाउन",
+        // Chat Responses
+        chatHello: (name) => `नमस्ते ${name}! मैं आपका डैशबोर्ड सहायक हूँ। उपस्थिति, अंक, फीस, सत्र, या सुझावों के बारे में पूछें!`,
+        chatNotLoaded: "कृपया पहले अपना नाम दर्ज करके 'मेरा डेटा लोड करें' पर क्लिक करके अपना डेटा लोड करें!",
+        chatNotFound: (name) => `छात्र "${name}" नहीं मिला। एलिस, बॉब, चार्ली, या उदय आज़माएँ।`,
+        chatAttendance: (count, total, percent) => `आपकी कुल उपस्थिति **${total}** सत्रों में से **${count}** है, जो **${percent}%** है। अच्छा काम करते रहें!`,
+        chatMarks: (marks) => `आपके अंक 100 में से **${marks || 'N/A'}** हैं।`,
+        chatFeesPaid: "शुल्क सब स्पष्ट है! 👍",
+        chatFeesUnpaid: "कृपया किसी भी लंबित शुल्क को निपटाने के लिए कॉलेज कार्यालय से संपर्क करें।",
+        chatFeesStatus: (status) => `आपकी शुल्क स्थिति है: **${status || 'N/A'}**।`,
+        chatSessions: (length) => `आपके कुल सत्र **${length}** हैं। आप पूरी सूची 'मेरे सत्र' फ़िल्टर में देख सकते हैं।`,
+        chatNoSessions: "अभी कोई सत्र उपलब्ध नहीं है।",
+        chatRisk: (risk, marks) => `आपके मेट्रिक्स (अंक: ${marks}) के आधार पर, आपका अनुमानित ड्रॉपआउट जोखिम लगभग **${risk}%** है। इसे कम करने के लिए उपस्थिति और ग्रेड पर ध्यान दें!`,
+        chatDefault: "मुझे यकीन नहीं है। **उपस्थिति**, **अंक**, **फीस**, **सत्र**, या **सुझावों** के बारे में पूछने का प्रयास करें।",
+        chatTips: ["सभी सत्रों में नियमित रूप से भाग लें! आपकी उपस्थिति मायने रखती है।", "सीखने को मजबूत करने के लिए रोजाना अपने नोट्स की समीक्षा करें।", "अपने शिक्षक से तुरंत संदेह दूर करें—प्रतीक्षा न करें!", "प्रशासनिक समस्याओं से बचने के लिए समय पर अपनी फीस का भुगतान करें।", "साप्ताहिक रूप से अपने प्रदर्शन को ट्रैक करने के लिए डैशबोर्ड का उपयोग करें।"],
+    },
+    kan: {
+        mainTitle: "ವಿದ್ಯಾರ್ಥಿ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್",
+        loadNameLabel: "ಡೇಟಾ ಲೋಡ್ ಮಾಡಲು ನಿಮ್ಮ ಹೆಸರನ್ನು ನಮೂದಿಸಿ",
+        namePlaceholder: "ಉದಾ. ಅಲಿಸ್",
+        loadDataBtn: "ನನ್ನ ಡೇಟಾವನ್ನು ಲೋಡ್ ಮಾಡಿ",
+        sessionsTitle: "ನನ್ನ ಸೆಷನ್‌ಗಳು",
+        sessionsFilterText: "ಸೆಷನ್ ಮೂಲಕ ಡೇಟಾವನ್ನು ಫಿಲ್ಟರ್ ಮಾಡಿ:",
+        selectSessionOption: "ಸೆಷನ್ ಆಯ್ಕೆಮಾಡಿ",
+        dataTitle: "ನನ್ನ ಡೇಟಾ",
+        dataPlaceholder: "ಡೇಟಾ ಲೋಡ್ ಆದ ನಂತರ ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತದೆ.",
+        chartTitle: "ಕಾರ್ಯಕ್ಷಮತೆ ಚಾರ್ಟ್",
+        chatHeaderTitle: "💬 ಉದಯ್ ಸಹಾಯಕ",
+        chatInputPlaceholder: "ನಿಮ್ಮ ಸಂದೇಶವನ್ನು ಟೈಪ್ ಮಾಡಿ...",
+        // Data Labels
+        labelName: "ಹೆಸರು:",
+        labelClass: "ತರಗತಿ:",
+        labelAttendance: "ಹಾಜರಾತಿ:",
+        labelMarks: "ಅಂಕಗಳು:",
+        labelFeesStatus: "ಶುಲ್ಕ ಸ್ಥಿತಿ:",
+        // Chart Labels
+        chartLabelAttendance: "ಹಾಜರಾತಿ (%)",
+        chartLabelMarks: "ಅಂಕಗಳು (100 ರಲ್ಲಿ)",
+        chartLabelFeesStatus: "ಶುಲ್ಕ ಪಾವತಿ ಸ್ಥಿತಿ",
+        chartTitleText: "ಒಟ್ಟಾರೆ ಕಾರ್ಯಕ್ಷಮತೆಯ ವಿಭಜನೆ",
+        // Chat Responses
+        chatHello: (name) => `ನಮಸ್ಕಾರ ${name}! ನಾನು ನಿಮ್ಮ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್ ಸಹಾಯಕ. ಹಾಜರಾತಿ, ಅಂಕಗಳು, ಶುಲ್ಕ, ಸೆಷನ್‌ಗಳು ಅಥವಾ ಸಲಹೆಗಳ ಬಗ್ಗೆ ಕೇಳಿ!`,
+        chatNotLoaded: "ದಯವಿಟ್ಟು ಮೊದಲು ನಿಮ್ಮ ಹೆಸರನ್ನು ನಮೂದಿಸಿ ಮತ್ತು 'ನನ್ನ ಡೇಟಾವನ್ನು ಲೋಡ್ ಮಾಡಿ' ಕ್ಲಿಕ್ ಮಾಡುವ ಮೂಲಕ ನಿಮ್ಮ ಡೇಟಾವನ್ನು ಲೋಡ್ ಮಾಡಿ!",
+        chatNotFound: (name) => `ವಿದ್ಯಾರ್ಥಿ "${name}" ಕಂಡುಬಂದಿಲ್ಲ. ಅಲಿಸ್, ಬಾಬ್, ಚಾರ್ಲಿ, ಅಥವಾ ಉದಯ್ ಪ್ರಯತ್ನಿಸಿ.`,
+        chatAttendance: (count, total, percent) => `ನಿಮ್ಮ ಒಟ್ಟು ಹಾಜರಾತಿ **${total}** ಸೆಷನ್‌ಗಳಲ್ಲಿ **${count}** ಆಗಿದೆ, ಅಂದರೆ **${percent}%** ಆಗಿದೆ. ನಿಮ್ಮ ಉತ್ತಮ ಕಾರ್ಯ ಮುಂದುವರಿಸಿ!`,
+        chatMarks: (marks) => `ನಿಮ್ಮ ಅಂಕಗಳು 100ಕ್ಕೆ **${marks || 'N/A'}** ಇವೆ.`,
+        chatFeesPaid: "ಶುಲ್ಕ ಎಲ್ಲಾ ತೆರವುಗೊಂಡಿದೆ! 👍",
+        chatFeesUnpaid: "ಬಾಕಿ ಇರುವ ಯಾವುದೇ ಶುಲ್ಕವನ್ನು ತೆರವುಗೊಳಿಸಲು ದಯವಿಟ್ಟು ಕಾಲೇಜು ಕಚೇರಿಯನ್ನು ಪರಿಶೀಲಿಸಿ.",
+        chatFeesStatus: (status) => `ನಿಮ್ಮ ಶುಲ್ಕದ ಸ್ಥಿತಿ: **${status || 'N/A'}** ಆಗಿದೆ.`,
+        chatSessions: (length) => `ನಿಮ್ಮ ಒಟ್ಟು ಸೆಷನ್‌ಗಳು **${length}** ಇವೆ. 'ನನ್ನ ಸೆಷನ್‌ಗಳು' ಫಿಲ್ಟರ್‌ನಲ್ಲಿ ನೀವು ಸಂಪೂರ್ಣ ಪಟ್ಟಿಯನ್ನು ನೋಡಬಹುದು.`,
+        chatNoSessions: "ಯಾವುದೇ ಸೆಷನ್‌ಗಳು ಇನ್ನೂ ಲಭ್ಯವಿಲ್ಲ.",
+        chatRisk: (risk, marks) => `ನಿಮ್ಮ ಮೆಟ್ರಿಕ್‌ಗಳನ್ನು (ಅಂಕಗಳು: ${marks}) ಆಧರಿಸಿ, ನಿಮ್ಮ ಪ್ರಸ್ತುತ ಅಂದಾಜು ಡ್ರಾಪ್‌ಔಟ್ ಅಪಾಯವು ಸರಿಸುಮಾರು **${risk}%** ಆಗಿದೆ. ಇದನ್ನು ಕಡಿಮೆ ಮಾಡಲು ಹಾಜರಾತಿ ಮತ್ತು ಗ್ರೇಡ್‌ಗಳನ್ನು ಸುಧಾರಿಸುವುದರ ಮೇಲೆ ಕೇಂದ್ರೀಕರಿಸಿ!`,
+        chatDefault: "ನನಗೆ ಖಚಿತವಿಲ್ಲ. **ಹಾಜರಾತಿ**, **ಅಂಕಗಳು**, **ಶುಲ್ಕ**, **ಸೆಷನ್‌ಗಳು**, ಅಥವಾ **ಸಲಹೆಗಳ** ಬಗ್ಗೆ ಕೇಳಲು ಪ್ರಯತ್ನಿಸಿ.",
+        chatTips: ["ಎಲ್ಲಾ ಸೆಷನ್‌ಗಳಿಗೆ ನಿಯಮಿತವಾಗಿ ಹಾಜರಾಗಿ! ನಿಮ್ಮ ಉಪಸ್ಥಿತಿ ಮುಖ್ಯವಾಗಿದೆ.", "ಕಲಿಕೆಯನ್ನು ಬಲಪಡಿಸಲು ಪ್ರತಿದಿನ ನಿಮ್ಮ ಟಿಪ್ಪಣಿಗಳನ್ನು ಪರಿಶೀಲಿಸಿ.", "ನಿಮ್ಮ ಶಿಕ್ಷಕರೊಂದಿಗೆ ತಕ್ಷಣವೇ ಅನುಮಾನಗಳನ್ನು ತೆರವುಗೊಳಿಸಿ—ಕಾಯಬೇಡಿ!", "ಆಡಳಿತಾತ್ಮಕ ಸಮಸ್ಯೆಗಳನ್ನು ತಪ್ಪಿಸಲು ನಿಮ್ಮ ಶುಲ್ಕವನ್ನು ಸಮಯಕ್ಕೆ ಪಾವತಿಸಿ.", "ಪ್ರತಿ ವಾರ ನಿಮ್ಮ ಕಾರ್ಯಕ್ಷಮತೆಯನ್ನು ಟ್ರ್ಯಾಕ್ ಮಾಡಲು ಡ್ಯಾಶ್‌ಬೋರ್ಡ್ ಬಳಸಿ."],
+    },
+    mar: {
+        mainTitle: "छात्र डैशबोर्ड",
+        loadNameLabel: "डेटा लोड करवा खातिर आप रो नाम लिखो",
+        namePlaceholder: "ज्यूँ: एलिस",
+        loadDataBtn: "मारो डेटा लोड करो",
+        sessionsTitle: "म्हारा सत्र",
+        sessionsFilterText: "सत्र रे हिसाब सूं डेटा फ़िल्टर करो:",
+        selectSessionOption: "सत्र चुणो",
+        dataTitle: "मारो डेटा",
+        dataPlaceholder: "डेटा लोड व्हिया पछे अठे दिकेला।",
+        chartTitle: "प्रदर्शन चार्ट",
+        chatHeaderTitle: "💬 उदय सहायक",
+        chatInputPlaceholder: "आपरो संदेश लिखो...",
+        // Data Labels
+        labelName: "नाम:",
+        labelClass: "कक्षा:",
+        labelAttendance: "उपस्थिती:",
+        labelMarks: "गुण:",
+        labelFeesStatus: "फीस री स्थिती:",
+        // Chart Labels
+        chartLabelAttendance: "उपस्थिती (%)",
+        chartLabelMarks: "गुण (100 माँय सूं)",
+        chartLabelFeesStatus: "फीस चुकावणी री स्थिती",
+        chartTitleText: "सगळा प्रदर्शन रो विवरण",
+        // Chat Responses
+        chatHello: (name) => `राम-राम ${name}! मूँ थारो डैशबोर्ड सहायक हूँ। उपस्थिती, गुण, फीस, सत्र, या सुझावाँ बारे में पूछो!`,
+        chatNotLoaded: "कृपा कर'र पे'ला आपरो नाम लिख'र 'मारो डेटा लोड करो' माथे क्लिक कर'र आपरो डेटा लोड करो!",
+        chatNotFound: (name) => `छात्र "${name}" नी मिल्यो। एलिस, बॉब, चार्ली, या उदय आज़माओ।`,
+        chatAttendance: (count, total, percent) => `थारी सगळी उपस्थिती **${total}** सत्राँ माँय सूं **${count}** है, जो **${percent}%** है। यूँ ही बणाय राखो!`,
+        chatMarks: (marks) => `थारा गुण 100 माँय सूं **${marks || 'N/A'}** है।`,
+        chatFeesPaid: "फीस सगळी साफ है! 👍",
+        chatFeesUnpaid: "कृपा कर'र बकाया फीस चुकावणा खातिर कॉलेज ऑफिस सूं संपर्क करो।",
+        chatFeesStatus: (status) => `थारी फीस री स्थिती है: **${status || 'N/A'}**।`,
+        chatSessions: (length) => `थारा सगळा सत्र **${length}** है। पूरी लिस्ट थें 'म्हारा सत्र' फ़िल्टर माँय देख सको।`,
+        chatNoSessions: "हाल कोई सत्र उपलब्ध कोनी है।",
+        chatRisk: (risk, marks) => `थारा मेट्रिक्स (गुण: ${marks}) रे आधार माथे, थारो अनुमानित ड्रॉपआउट रो जोखिम लगभग **${risk}%** है। ईनें कम करणा खातिर उपस्थिती अर ग्रेड माथे ध्यान दो!`,
+        chatDefault: "मूँ आश्वस्त कोनी हूँ। **उपस्थिती**, **गुण**, **फीस**, **सत्राँ**, या **सुझावाँ** बारे में पूछणो रो प्रयास करो।",
+        chatTips: ["सगळा सत्राँ में नियमित रूप सूं हाज़िर रैवो! थारी मौजूदगी जरूरी है।", "रोज़ आपरी नोट्स री समीक्षा कर'र सिखणो मजबूत करो।", "आपरा शिक्षक सूं तुरंत शंका दूर करो—इंतेज़ार मत करो!", "प्रशासनिक समस्यावाँ सूं बचणा खातिर समय माथे आपरी फीस चुकाओ।", "साप्ताहिक रूप सूं आपरो प्रदर्शन ट्रैक करणा खातिर डैशबोर्ड रो उपयोग करो।"],
+    }
+};
+// --- Global Variables ---
+let studentData = null;
+let studentChart = null;
+const sessionSelect = document.getElementById("sessionSelect");
+const studentInfoDiv = document.getElementById("studentInfo");
+const chatWidget = document.getElementById("chatWidget");
+const chatBox = document.getElementById("chatBox");
+const chatInput = document.getElementById("chatInput");
+const languageSelect = document.getElementById("languageSelect");
 
-function loadStudentData(){
-  const name=document.getElementById("studentNameInput").value.trim();
-  if(!name){ alert("Enter your name"); return; }
-  const excelData=JSON.parse(localStorage.getItem("excelData"))||[];
-  studentData=excelData.find(s=>s.Name.toLowerCase()===name.toLowerCase());
-  if(!studentData){ alert("Student not found"); return; }
 
-  const sessionSelect=document.getElementById("sessionSelect");
-  sessionSelect.innerHTML='<option value="">Select Session</option>';
-  const sessions=JSON.parse(localStorage.getItem("sessions"))||[];
-  sessions.forEach(s=>{ const opt=document.createElement("option"); opt.value=s; opt.innerText=s; sessionSelect.appendChild(opt); });
-  displayStudentInfo();
-  appendMessage(`Hello ${studentData.Name}! I am your dashboard assistant. Ask me about attendance, marks, fees, sessions, or tips!`,'bot');
+// --- Mock Data Setup (CHANGED) ---
+localStorage.clear(); // Ensure a clean mock environment
+
+// Alice: High Performance. Bob: At-Risk. Charlie: Solid. Uday: Perfect.
+const MOCK_EXCEL_DATA = [
+  {Name:"Alice",Class:"10th",Marks:95,FeesStatus:"Paid"},
+  {Name:"Bob",Class:"10th",Marks:62,FeesStatus:"Unpaid"},
+  {Name:"Charlie",Class:"11th",Marks:85,FeesStatus:"Paid"},
+  {Name:"Uday",Class:"12th",Marks:100,FeesStatus:"Paid"} 
+];
+const MOCK_SESSIONS = ["Session 1","Session 2","Session 3","Session 4"];
+// Attendance data updated: Alice (3/4), Bob (2/4), Charlie (4/4), Uday (4/4)
+const MOCK_ATTENDANCE = [
+  {student:"Alice",session:"Session 1"},{student:"Alice",session:"Session 2"},{student:"Alice",session:"Session 4"},
+  {student:"Bob",session:"Session 1"},{student:"Bob",session:"Session 3"},
+  {student:"Charlie",session:"Session 1"},{student:"Charlie",session:"Session 2"},{student:"Charlie",session:"Session 3"},{student:"Charlie",session:"Session 4"},
+  {student:"Uday",session:"Session 1"},{student:"Uday",session:"Session 2"},{student:"Uday",session:"Session 3"},{student:"Uday",session:"Session 4"}
+];
+
+localStorage.setItem("excelData",JSON.stringify(MOCK_EXCEL_DATA));
+localStorage.setItem("sessions",JSON.stringify(MOCK_SESSIONS));
+localStorage.setItem("attendance",JSON.stringify(MOCK_ATTENDANCE));
+
+// --- Language Update Function ---
+
+function updateLanguage(){
+    const lang = languageSelect.value;
+    const data = langData[lang];
+
+    // Main Heading and Input
+    document.getElementById("mainTitle").innerHTML = `<i class="fas fa-user-graduate"></i> ${data.mainTitle}`;
+    document.getElementById("labelNameInput").innerText = data.loadNameLabel;
+    document.getElementById("studentNameInput").placeholder = data.namePlaceholder;
+    document.getElementById("loadDataBtn").innerHTML = `<i class="fas fa-database"></i> ${data.loadDataBtn}`;
+
+    // Card Titles
+    document.getElementById("sessionsTitle").innerHTML = `<i class="fas fa-calendar-alt"></i> ${data.sessionsTitle}`;
+    document.getElementById("sessionsFilterText").innerText = data.sessionsFilterText;
+    document.getElementById("selectSessionOption").innerText = data.selectSessionOption;
+    document.getElementById("dataTitle").innerHTML = `<i class="fas fa-id-card"></i> ${data.dataTitle}`;
+    document.getElementById("dataPlaceholder").innerText = data.dataPlaceholder;
+    document.getElementById("chartTitle").innerHTML = `<i class="fas fa-chart-bar"></i> ${data.chartTitle}`;
+
+    // Chat
+    document.getElementById("chatHeaderTitle").innerHTML = `💬 ${data.chatHeaderTitle.substring(2)}`;
+    document.getElementById("chatInput").placeholder = data.chatInputPlaceholder;
+
+    // Redraw Student Info and Chart if data is loaded
+    displayStudentInfo();
+    
+    // Clear chat history on language change for consistency
+    chatBox.innerHTML = ''; 
+    // Show a new welcome message
+    if (studentData) {
+        appendMessage(data.chatHello(studentData.Name), 'bot');
+    }
 }
 
-document.getElementById("sessionSelect").addEventListener("change",displayStudentInfo);
+// --- Initial Setup Functions ---
 
+/** Loads session options on page load. */
+function loadSessionOptions() {
+    const lang = languageSelect.value;
+    const data = langData[lang];
+    
+    sessionSelect.innerHTML = `<option value="">${data.selectSessionOption}</option>`;
+    const sessions = JSON.parse(localStorage.getItem("sessions")) || [];
+    sessions.forEach(s => { 
+        const opt = document.createElement("option"); 
+        opt.value = s; 
+        opt.innerText = s; 
+        sessionSelect.appendChild(opt); 
+    });
+}
+
+/** Loads student data from mock storage based on name input. */
+function loadStudentData(){
+  const name = document.getElementById("studentNameInput").value.trim();
+  const lang = languageSelect.value;
+  const data = langData[lang];
+
+  if(!name){ alert(data.loadNameLabel); return; }
+  
+  const excelData = JSON.parse(localStorage.getItem("excelData")) || [];
+  studentData = excelData.find(s => s.Name.toLowerCase() === name.toLowerCase());
+  
+  if(!studentData){ 
+    alert(data.chatNotFound(name)); 
+    studentInfoDiv.innerHTML = `<p class="text-gray-400">${data.dataPlaceholder}</p>`;
+    if(studentChart) studentChart.destroy();
+    return; 
+  }
+
+  // Set initial chat message and update UI
+  displayStudentInfo();
+  appendMessage(data.chatHello(studentData.Name), 'bot');
+}
+
+// --- Data Display and Chart Functions ---
+
+document.getElementById("sessionSelect").addEventListener("change", displayStudentInfo);
+languageSelect.addEventListener("change", () => {
+    loadSessionOptions();
+    updateLanguage();
+});
+
+/** Calculates and displays student info based on selected session. */
 function displayStudentInfo(){
   if(!studentData) return;
-  const session=document.getElementById("sessionSelect").value;
-  const attendance=JSON.parse(localStorage.getItem("attendance"))||[];
-  const sessionAttendance=attendance.filter(a=>a.student===studentData.Name && (!session || a.session===session)).length;
-  document.getElementById("studentInfo").innerHTML=`
-    <p><strong>Name:</strong> ${studentData.Name}</p>
-    <p><strong>Class:</strong> ${studentData.Class || 'N/A'}</p>
-    <p><strong>Attendance in session:</strong> ${sessionAttendance}</p>
-    <p><strong>Marks:</strong> ${studentData.Marks || 'N/A'}</p>
-    <p><strong>Fees Status:</strong> ${studentData.FeesStatus || 'N/A'}</p>
+  
+  const lang = languageSelect.value;
+  const data = langData[lang];
+
+  const selectedSession = document.getElementById("sessionSelect").value;
+  const allAttendance = JSON.parse(localStorage.getItem("attendance")) || [];
+  
+  // Calculate attendance count
+  const sessionAttendance = allAttendance.filter(a => 
+      a.student.toLowerCase() === studentData.Name.toLowerCase() && 
+      (!selectedSession || a.session === selectedSession)
+  ).length;
+
+  // Calculate total possible sessions for attendance percentage
+  const totalSessions = JSON.parse(localStorage.getItem("sessions")).length;
+  const attendancePercent = totalSessions > 0 ? ((sessionAttendance / totalSessions) * 100).toFixed(1) : 0;
+  
+  const feesStatus = studentData.FeesStatus || 'N/A';
+
+  studentInfoDiv.innerHTML = `
+    <p><strong><i class="fas fa-user"></i> ${data.labelName}</strong> ${studentData.Name}</p>
+    <p><strong><i class="fas fa-graduation-cap"></i> ${data.labelClass}</strong> ${studentData.Class || 'N/A'}</p>
+    <p><strong><i class="fas fa-check-circle"></i> ${data.labelAttendance}</strong> ${sessionAttendance} / ${totalSessions} sessions (${attendancePercent}%)</p>
+    <p><strong><i class="fas fa-star"></i> ${data.labelMarks}</strong> ${studentData.Marks || 'N/A'} / 100</p>
+    <p><strong><i class="fas fa-rupee-sign"></i> ${data.labelFeesStatus}</strong> <span class="${feesStatus === 'Paid' ? 'text-green-400' : 'text-red-400'}">${feesStatus}</span></p>
   `;
-  renderStudentChart(sessionAttendance, studentData.Marks || 0, studentData.FeesStatus);
+  
+  renderStudentChart(parseFloat(attendancePercent), studentData.Marks || 0, studentData.FeesStatus);
 }
 
-// Render pie chart
-let studentChart=null;
-function renderStudentChart(attendance, marks, fees){
-  const paid=(fees.toLowerCase()==='paid')?1:0;
-  const unpaid=(fees.toLowerCase()!=='paid')?1:0;
+/** Renders the student's performance data in a pie chart. */
+function renderStudentChart(attendancePercent, marks, fees){
+  const lang = languageSelect.value;
+  const data = langData[lang];
+
+  // Dynamic colors based on status for better visualization
+  const attendanceColor = (attendancePercent > 70) ? '#00bfff' : '#ff9900'; // Blue for good, Orange for low
+  const marksColor = (marks > 80) ? '#7f00ff' : '#ff0066'; // Purple for high, Pink/Red for low
+  const feesColor = (fees.toLowerCase() === 'paid') ? '#00ff7f' : '#ff0000'; // Green for paid, Red for unpaid
+  
+  const feesPaid = (fees.toLowerCase() === 'paid') ? 100 : 0;
+  
   if(studentChart) studentChart.destroy();
-  const ctx=document.getElementById("studentChart").getContext("2d");
-  studentChart=new Chart(ctx,{
-    type:'pie',
-    data:{
-      labels:['Attendance','Marks','Fees Paid','Fees Not Paid'],
-      datasets:[{data:[attendance,marks,paid,unpaid],backgroundColor:['#7f00ff','#00bfff','#00ff7f','#ff1a75'] }]
+  const ctx = document.getElementById("studentChart").getContext("2d");
+  
+  studentChart = new Chart(ctx, {
+    type: 'doughnut', 
+    data: {
+      labels: [data.chartLabelAttendance, data.chartLabelMarks, data.chartLabelFeesStatus],
+      datasets: [
+        {
+          label: data.chartTitleText,
+          data: [attendancePercent, marks, feesPaid], 
+          backgroundColor: [attendanceColor, marksColor, feesColor], // Use dynamic colors
+          borderWidth: 1
+        }
+      ]
     },
-    options:{responsive:true}
+    options: {
+        responsive: true, 
+        plugins: {
+            legend: { position: 'bottom', labels: { color: '#fff' } },
+            title: { display: true, text: data.chartTitleText, color: '#fff' }
+        }
+    }
   });
 }
 
-// Chatbot logic
-const chatBox=document.getElementById("chatBox");
-const chatInput=document.getElementById("chatInput");
-chatInput.addEventListener("keydown", function(e){
-  if(e.key==='Enter') sendMessage();
-});
+// --- Chatbot Functions ---
+
+/** Toggles the chatbot widget open/closed. */
+function toggleChat(){
+  const toggleIcon = document.getElementById("chatToggle");
+  
+  if(chatWidget.classList.contains("expanded")){
+    // Collapse
+    chatWidget.classList.remove("expanded");
+    chatBox.style.display = "none";
+    document.querySelector(".chat-input-container").style.display = "none";
+    toggleIcon.innerText = "+";
+  } else {
+    // Expand
+    chatWidget.classList.add("expanded");
+    chatBox.style.display = "block";
+    document.querySelector(".chat-input-container").style.display = "flex";
+    toggleIcon.innerText = "−";
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+}
+
+document.getElementById("chatInput").addEventListener("keydown", function(e){ if(e.key==='Enter') sendMessage(); });
 
 function sendMessage(){
-  const msg=chatInput.value.trim();
+  const msg = chatInput.value.trim();
   if(!msg) return;
   appendMessage(msg,'user');
-  chatInput.value='';
-  setTimeout(()=>respond(msg),400);
+  chatInput.value = '';
+  setTimeout(() => respond(msg), 400);
 }
 
 function appendMessage(msg,type){
-  const div=document.createElement("div");
-  div.className=`message ${type}`;
-  div.innerText=msg;
+  const div = document.createElement("div");
+  div.className = `message ${type}`;
+  div.innerHTML = msg; // Use innerHTML to allow **bolding**
   chatBox.appendChild(div);
-  chatBox.scrollTop=chatBox.scrollHeight;
+  chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-// chatbot responses
 function respond(msg){
-  if(!studentData){ appendMessage("Please load your data first!",'bot'); return; }
-  msg=msg.toLowerCase();
-  let reply="I am not sure about that. Try asking about attendance, marks, fees, sessions, or tips.";
+  const lang = languageSelect.value;
+  const data = langData[lang];
+  const totalSessions = JSON.parse(localStorage.getItem("sessions")).length;
 
-  if(msg.includes("attendance")) {
-    const attendance=JSON.parse(localStorage.getItem("attendance"))||[];
-    const count=attendance.filter(a=>a.student===studentData.Name).length;
-    reply=`Your total attendance is ${count} days.`;
-  } 
-  else if(msg.includes("marks")) {
-    reply=`Your marks are ${studentData.Marks || 'N/A'}.`;
-  } 
-  else if(msg.includes("fees")) {
-    reply=`Your fees status is: ${studentData.FeesStatus || 'N/A'}.`;
-  } 
-  else if(msg.includes("session")) {
-    const sessions=JSON.parse(localStorage.getItem("sessions"))||[];
-    reply=sessions.length>0 ? `Your sessions are: ${sessions.join(', ')}.` : "No sessions available yet.";
-  } 
-  else if(msg.includes("risk") || msg.includes("dropout")) {
-    const risk=Math.floor(Math.random()*50+50);
-    reply=`Based on attendance and marks, your dropout risk is approximately ${risk}%.`;
-  } 
-  else if(msg.includes("hi") || msg.includes("hello")) {
-    reply=`Hello ${studentData.Name}! How can I assist you today?`;
-  } 
-  else if(msg.includes("tip") || msg.includes("advice")) {
-    const tips=["Attend all sessions regularly!","Review your notes daily.","Clear doubts with your teacher.","Pay your fees on time to avoid issues."];
-    reply=tips[Math.floor(Math.random()*tips.length)];
+  if(!studentData){ appendMessage(data.chatNotLoaded,'bot'); return; }
+  
+  msg = msg.toLowerCase();
+  let reply = data.chatDefault;
+
+  if(msg.includes("attendance") || msg.includes("upasti") || msg.includes("haajiraati")) {
+    const attendance = JSON.parse(localStorage.getItem("attendance")) || [];
+    const count = attendance.filter(a => a.student.toLowerCase() === studentData.Name.toLowerCase()).length;
+    const percent = totalSessions > 0 ? ((count / totalSessions) * 100).toFixed(1) : 0;
+    reply = data.chatAttendance(count, totalSessions, percent);
+  } else if(msg.includes("marks") || msg.includes("ank")) {
+    reply = data.chatMarks(studentData.Marks);
+  } else if(msg.includes("fees") || msg.includes("shulk")) {
+    const status = studentData.FeesStatus || 'N/A';
+    reply = data.chatFeesStatus(status);
+    if (status.toLowerCase() === 'paid') {
+        reply += ` ${data.chatFeesPaid}`;
+    } else if (status.toLowerCase() === 'unpaid') {
+        reply += ` ${data.chatFeesUnpaid}`;
+    }
+  } else if(msg.includes("session") || msg.includes("satra")) {
+    const sessions = JSON.parse(localStorage.getItem("sessions")) || [];
+    reply = sessions.length > 0 ? data.chatSessions(sessions.length) : data.chatNoSessions;
+  } else if(msg.includes("risk") || msg.includes("dropout")) {
+    const attendance = JSON.parse(localStorage.getItem("attendance")) || [];
+    const attendanceCount = attendance.filter(a => a.student.toLowerCase() === studentData.Name.toLowerCase()).length;
+    const attendancePercent = (attendanceCount / totalSessions);
+    const marks = studentData.Marks || 0;
+    const riskFactor = (1 - attendancePercent) * 50 + (100 - marks) * 0.5;
+    const risk = Math.min(100, Math.max(0, riskFactor)).toFixed(0);
+    
+    reply = data.chatRisk(risk, marks);
+  } else if(msg.includes("hi") || msg.includes("hello") || msg.includes("namaste")) {
+    reply = data.chatHello(studentData.Name).split('!')[0] + '!'; // Shortened greeting
+  } else if(msg.includes("tip") || msg.includes("advice") || msg.includes("sujhaav")) {
+    const tips = data.chatTips;
+    reply = `Here's a quick tip: **${tips[Math.floor(Math.random()*tips.length)]}**`;
   }
-
   appendMessage(reply,'bot');
 }
 
-// toggle chat visibility
-function toggleChat(){
-  const widget=document.getElementById("chatWidget");
-  const chatBoxDiv=widget.querySelector(".chat-box");
-  const inputDiv=widget.querySelector(".chat-input-container");
-  if(chatBoxDiv.style.display==="none"){
-    chatBoxDiv.style.display="block";
-    inputDiv.style.display="flex";
-  } else {
-    chatBoxDiv.style.display="none";
-    inputDiv.style.display="none";
-  }
-}
+// --- Initializer ---
+document.addEventListener('DOMContentLoaded', () => {
+    updateLanguage(); // Initial load to set English as default
+    loadSessionOptions();
+    // Start collapsed and let user manually open it for better initial UX
+    chatWidget.classList.remove("expanded");
+    document.getElementById("chatToggle").innerText = "+";
+});
 </script>
 
 </body>

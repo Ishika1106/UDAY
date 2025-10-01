@@ -1,415 +1,459 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Uday Admin Dashboard</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    body { background: linear-gradient(135deg, #0a0a0a, #1e003e, #001a33); color: #fff; font-family: sans-serif; }
-    .toast { position: fixed; bottom: 20px; right: 20px; background: #1e003e; border: 1px solid #7f00ff; padding: 12px 20px; border-radius: 8px; box-shadow: 0 0 10px #7f00ff; opacity: 0; transform: translateY(20px); transition: all 0.3s ease-in-out; }
-    .toast.show { opacity:1; transform: translateY(0); }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uday Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #0a0a0a, #1e003e, #001a33);
+            color: #fff;
+            font-family: sans-serif;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #1e003e;
+            border: 1px solid #7f00ff;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px #7f00ff;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease-in-out;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
 </head>
+
 <body class="min-h-screen">
 
-  <!-- Header -->
-  <header class="p-6 bg-gradient-to-r from-purple-900 to-blue-900 shadow-lg flex flex-col md:flex-row items-center justify-between gap-2 md:gap-0">
-    <h1 class="text-3xl font-extrabold text-purple-400 flex items-center gap-2">
-      <i class="fas fa-user-shield"></i> Uday Admin Dashboard
-    </h1>
-    <span class="italic text-gray-400">Unified Dropout Analysis for Youth</span>
-    <select id="languageSelect" class="mt-2 md:mt-0 p-2 rounded bg-gray-800 text-white">
-      <option value="eng">English</option>
-      <option value="hin">Hindi</option>
-      <option value="kan">Kannada</option>
-      <option value="mar">Marwari</option>
-    </select>
-  </header>
+    <!-- Header -->
+    <header
+        class="p-6 bg-gradient-to-r from-purple-900 to-blue-900 shadow-lg flex flex-col md:flex-row items-center justify-between gap-2 md:gap-0">
+        <h1 class="text-3xl font-extrabold text-purple-400 flex items-center gap-2">
+            <i class="fas fa-user-shield"></i> Uday Admin Dashboard
+        </h1>
+        <span class="italic text-gray-400">Unified Dropout Analysis for Youth</span>
+        <select id="languageSelect" class="mt-2 md:mt-0 p-2 rounded bg-gray-800 text-white">
+            <option value="eng">English</option>
+            <option value="hin">Hindi</option>
+            <option value="kan">Kannada</option>
+            <option value="mar">Marwari</option>
+        </select>
+    </header>
 
-  <main class="p-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
-    <!-- Teacher Section -->
-    <section class="bg-gray-800 rounded-xl p-6 shadow-lg">
-      <h2 id="teacherHeader" class="text-2xl font-bold mb-4 text-purple-300"><i class="fas fa-chalkboard-teacher"></i> Teachers</h2>
-      <form id="teacherForm" class="flex gap-2 mb-4">
-        <input type="text" id="teacherName" placeholder="Enter Teacher Name" class="flex-1 p-2 rounded bg-gray-700 text-gray-200" required>
-        <button type="submit" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded text-white"><i class="fas fa-plus"></i></button>
-      </form>
-      <ul id="teacherList" class="space-y-2"></ul>
-      <button id="teacherNotifyBtn" onclick="sendNotification('Teacher')" class="mt-4 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white w-full">
-        <i class="fas fa-bell"></i> Send Notification to Teachers
-      </button>
-    </section>
+    <main class="p-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Teacher Section -->
+        <section class="bg-gray-800 rounded-xl p-6 shadow-lg">
+            <h2 id="teacherHeader" class="text-2xl font-bold mb-4 text-purple-300"><i
+                    class="fas fa-chalkboard-teacher"></i> Teachers</h2>
+            <form id="teacherForm" class="flex gap-2 mb-4">
+                <input type="text" id="teacherName" placeholder="Enter Teacher Name"
+                    class="flex-1 p-2 rounded bg-gray-700 text-gray-200" required>
+                <button type="submit" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded text-white"><i
+                        class="fas fa-plus"></i></button>
+            </form>
+            <ul id="teacherList" class="space-y-2"></ul>
+            <button id="teacherNotifyBtn" onclick="sendNotification('Teacher')"
+                class="mt-4 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white w-full">
+                <i class="fas fa-bell"></i> Send Notification to Teachers
+            </button>
+        </section>
 
-    <!-- Student Section -->
-    <section class="bg-gray-800 rounded-xl p-6 shadow-lg">
-      <h2 id="studentHeader" class="text-2xl font-bold mb-4 text-blue-300"><i class="fas fa-user-graduate"></i> Students</h2>
-      <form id="studentForm" class="flex gap-2 mb-4">
-        <input type="text" id="studentName" placeholder="Enter Student Name" class="flex-1 p-2 rounded bg-gray-700 text-gray-200" required>
-        <button type="submit" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white"><i class="fas fa-plus"></i></button>
-      </form>
-      <ul id="studentList" class="space-y-2"></ul>
-      <button id="studentNotifyBtn" onclick="sendNotification('Student')" class="mt-4 bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded text-white w-full">
-        <i class="fas fa-bell"></i> Send Notification to Students
-      </button>
-    </section>
+        <!-- Student Section -->
+        <section class="bg-gray-800 rounded-xl p-6 shadow-lg">
+            <h2 id="studentHeader" class="text-2xl font-bold mb-4 text-blue-300"><i class="fas fa-user-graduate"></i>
+                Students</h2>
+            <form id="studentForm" class="flex gap-2 mb-4">
+                <input type="text" id="studentName" placeholder="Enter Student Name"
+                    class="flex-1 p-2 rounded bg-gray-700 text-gray-200" required>
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white"><i
+                        class="fas fa-plus"></i></button>
+            </form>
+            <ul id="studentList" class="space-y-2"></ul>
+            <button id="studentNotifyBtn" onclick="sendNotification('Student')"
+                class="mt-4 bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded text-white w-full">
+                <i class="fas fa-bell"></i> Send Notification to Students
+            </button>
+        </section>
 
-    <!-- College Data Section -->
-    <section class="bg-gray-800 rounded-xl p-6 shadow-lg">
-      <h2 id="collegeHeader" class="text-2xl font-bold mb-4 text-pink-300"><i class="fas fa-university"></i> College Data</h2>
-      <div class="border-2 border-dashed border-gray-600 p-6 text-center rounded-lg">
-        <i class="fas fa-file-excel text-green-400 text-4xl mb-2"></i>
-        <p id="excelUploadText" class="mb-2">Upload Excel File (Name, Class, Attendance, Fees, Marks)</p>
-        <input type="file" id="excelFile" accept=".xlsx,.xls" class="text-gray-400">
-      </div>
-      <div id="excelOutput" class="mt-6 overflow-x-auto"></div>
-      <h3 id="classesHeader" class="text-xl font-semibold mt-6 text-indigo-300"><i class="fas fa-school"></i> Classes</h3>
-      <ul id="classList" class="mt-3 space-y-2"></ul>
-      <form id="classForm" class="flex gap-2 mt-3">
-        <input type="text" id="className" placeholder="Add Class" class="flex-1 p-2 rounded bg-gray-700 text-gray-200" required>
-        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded text-white"><i class="fas fa-plus"></i></button>
-      </form>
-    </section>
+        <!-- College Data Section -->
+        <section class="bg-gray-800 rounded-xl p-6 shadow-lg">
+            <h2 id="collegeHeader" class="text-2xl font-bold mb-4 text-pink-300"><i class="fas fa-university"></i>
+                College Data</h2>
+            <div class="border-2 border-dashed border-gray-600 p-6 text-center rounded-lg">
+                <i class="fas fa-file-excel text-green-400 text-4xl mb-2"></i>
+                <p id="excelUploadText" class="mb-2">Upload Excel File (Name, Class, Attendance, Fees, Marks)</p>
+                <input type="file" id="excelFile" accept=".xlsx,.xls" class="text-gray-400">
+            </div>
+            <div id="excelOutput" class="mt-6 overflow-x-auto"></div>
+            <h3 id="classesHeader" class="text-xl font-semibold mt-6 text-indigo-300"><i class="fas fa-school"></i>
+                Classes</h3>
+            <ul id="classList" class="mt-3 space-y-2"></ul>
+            <form id="classForm" class="flex gap-2 mt-3">
+                <input type="text" id="className" placeholder="Add Class"
+                    class="flex-1 p-2 rounded bg-gray-700 text-gray-200" required>
+                <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded text-white"><i
+                        class="fas fa-plus"></i></button>
+            </form>
+        </section>
 
-    <!-- Summary Cards -->
-    <section class="lg:col-span-3 grid grid-cols-1 md:grid-cols-5 gap-4 mt-6">
-      <div class="bg-gray-700 p-4 rounded text-center">
-        <h3 class="text-xl font-semibold">Total Teachers</h3>
-        <p id="totalTeachers" class="text-2xl font-bold text-purple-400">0</p>
-      </div>
-      <div class="bg-gray-700 p-4 rounded text-center">
-        <h3 class="text-xl font-semibold">Total Students</h3>
-        <p id="totalStudents" class="text-2xl font-bold text-blue-400">0</p>
-      </div>
-      <div class="bg-gray-700 p-4 rounded text-center">
-        <h3 class="text-xl font-semibold">Average Attendance</h3>
-        <p id="avgAttendance" class="text-2xl font-bold text-yellow-400">0</p>
-      </div>
-      <div class="bg-gray-700 p-4 rounded text-center">
-        <h3 class="text-xl font-semibold">Average Fees</h3>
-        <p id="avgFees" class="text-2xl font-bold text-pink-400">0</p>
-      </div>
-      <div class="bg-gray-700 p-4 rounded text-center">
-        <h3 class="text-xl font-semibold">Average Marks</h3>
-        <p id="avgMarks" class="text-2xl font-bold text-blue-400">0</p>
-      </div>
-    </section>
+        <!-- Summary Cards -->
+        <section class="lg:col-span-3 grid grid-cols-1 md:grid-cols-5 gap-4 mt-6">
+            <div class="bg-gray-700 p-4 rounded text-center">
+                <h3 class="text-xl font-semibold">Total Teachers</h3>
+                <p id="totalTeachers" class="text-2xl font-bold text-purple-400">0</p>
+            </div>
+            <div class="bg-gray-700 p-4 rounded text-center">
+                <h3 class="text-xl font-semibold">Total Students</h3>
+                <p id="totalStudents" class="text-2xl font-bold text-blue-400">0</p>
+            </div>
+            <div class="bg-gray-700 p-4 rounded text-center">
+                <h3 class="text-xl font-semibold">Average Attendance</h3>
+                <p id="avgAttendance" class="text-2xl font-bold text-yellow-400">0</p>
+            </div>
+            <div class="bg-gray-700 p-4 rounded text-center">
+                <h3 class="text-xl font-semibold">Average Fees</h3>
+                <p id="avgFees" class="text-2xl font-bold text-pink-400">0</p>
+            </div>
+            <div class="bg-gray-700 p-4 rounded text-center">
+                <h3 class="text-xl font-semibold">Average Marks</h3>
+                <p id="avgMarks" class="text-2xl font-bold text-blue-400">0</p>
+            </div>
+        </section>
 
-    <!-- Analytics Charts -->
-    <section class="bg-gray-800 rounded-xl p-6 shadow-lg lg:col-span-3 mt-6">
-      <h2 class="text-2xl font-bold mb-4 text-green-300"><i class="fas fa-chart-line"></i> Analytics Dashboard</h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="bg-gray-700 p-4 rounded">
-          <h3 class="text-xl font-semibold mb-2 text-yellow-300">Attendance</h3>
-          <canvas id="attendanceChart"></canvas>
-        </div>
-        <div class="bg-gray-700 p-4 rounded">
-          <h3 class="text-xl font-semibold mb-2 text-pink-300">Fees</h3>
-          <canvas id="feesChart"></canvas>
-        </div>
-        <div class="bg-gray-700 p-4 rounded">
-          <h3 class="text-xl font-semibold mb-2 text-blue-300">Marks</h3>
-          <canvas id="marksChart"></canvas>
-        </div>
-      </div>
-    </section>
-  </main>
+        <!-- Analytics Charts -->
+        <section class="bg-gray-800 rounded-xl p-6 shadow-lg lg:col-span-3 mt-6">
+            <h2 class="text-2xl font-bold mb-4 text-green-300"><i class="fas fa-chart-line"></i> Analytics Dashboard
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-gray-700 p-4 rounded">
+                    <h3 class="text-xl font-semibold mb-2 text-yellow-300">Attendance</h3>
+                    <canvas id="attendanceChart"></canvas>
+                </div>
+                <div class="bg-gray-700 p-4 rounded">
+                    <h3 class="text-xl font-semibold mb-2 text-pink-300">Fees</h3>
+                    <canvas id="feesChart"></canvas>
+                </div>
+                <div class="bg-gray-700 p-4 rounded">
+                    <h3 class="text-xl font-semibold mb-2 text-blue-300">Marks</h3>
+                    <canvas id="marksChart"></canvas>
+                </div>
+            </div>
+        </section>
+    </main>
 
-  <!-- Toast -->
-  <div id="toastContainer" class="fixed bottom-4 right-4 space-y-2 z-50"></div>
+    <!-- Toast -->
+    <div id="toastContainer" class="fixed bottom-4 right-4 space-y-2 z-50"></div>
 
-  <script>
-const langData = {
-  eng: {
-    teacher: "Teachers",
-    student: "Students",
-    college: "College Data",
-    classes: "Classes",
-    teacherPlaceholder: "Enter Teacher Name",
-    studentPlaceholder: "Enter Student Name",
-    classPlaceholder: "Add Class",
-    sendTeacher: "Send Notification to Teachers",
-    sendStudent: "Send Notification to Students",
-    excelUpload: "Upload Excel File (Name, Class, Attendance, Fees, Marks)",
-    summaryTeachers: "Total Teachers",
-    summaryStudents: "Total Students",
-    summaryAttendance: "Average Attendance",
-    summaryFees: "Average Fees",
-    summaryMarks: "Average Marks",
-    chartAttendance: "Attendance",
-    chartFees: "Fees",
-    chartMarks: "Marks"
-  },
-  hin: {
-    teacher: "शिक्षक",
-    student: "छात्र",
-    college: "कॉलेज डेटा",
-    classes: "कक्षाएँ",
-    teacherPlaceholder: "शिक्षक का नाम डालें",
-    studentPlaceholder: "छात्र का नाम डालें",
-    classPlaceholder: "कक्षा जोड़ें",
-    sendTeacher: "शिक्षकों को सूचना भेजें",
-    sendStudent: "छात्रों को सूचना भेजें",
-    excelUpload: "एक्सेल फ़ाइल अपलोड करें (नाम, कक्षा, उपस्थिति, फीस, अंक)",
-    summaryTeachers: "कुल शिक्षक",
-    summaryStudents: "कुल छात्र",
-    summaryAttendance: "औसत उपस्थिति",
-    summaryFees: "औसत फीस",
-    summaryMarks: "औसत अंक",
-    chartAttendance: "उपस्थिति",
-    chartFees: "फीस",
-    chartMarks: "अंक"
-  },
-  kan: {
-    teacher: "ಶಿಕ್ಷಕರು",
-    student: "ವಿದ್ಯಾರ್ಥಿಗಳು",
-    college: "ಕಾಲೇಜ್ ಡೇಟಾ",
-    classes: "ವರ್ಗಗಳು",
-    teacherPlaceholder: "ಶಿಕ್ಷಕರ ಹೆಸರು ನಮೂದಿಸಿ",
-    studentPlaceholder: "ವಿದ್ಯಾರ್ಥಿಗಳ ಹೆಸರು ನಮೂದಿಸಿ",
-    classPlaceholder: "ವರ್ಗ ಸೇರಿಸಿ",
-    sendTeacher: "ಶಿಕ್ಷಕರಿಗೆ ಸೂಚನೆ ಕಳುಹಿಸಿ",
-    sendStudent: "ವಿದ್ಯಾರ್ಥಿಗಳಿಗೆ ಸೂಚನೆ ಕಳುಹಿಸಿ",
-    excelUpload: "ಎಕ್ಸೆಲ್ ಫೈಲ್ ಅಪ್ಲೋಡ್ ಮಾಡಿ (ಹೆಸರು, ತರಗತಿ, ಹಾಜರಿ, ಶುಲ್ಕ, ಅಂಕ)",
-    summaryTeachers: "ಒಟ್ಟು ಶಿಕ್ಷಕರು",
-    summaryStudents: "ಒಟ್ಟು ವಿದ್ಯಾರ್ಥಿಗಳು",
-    summaryAttendance: "ಸರಾಸರಿ ಹಾಜರಿ",
-    summaryFees: "ಸರಾಸರಿ ಶುಲ್ಕ",
-    summaryMarks: "ಸರಾಸರಿ ಅಂಕಗಳು",
-    chartAttendance: "ಹಾಜರಿ",
-    chartFees: "ಶುಲ್ಕ",
-    chartMarks: "ಅಂಕಗಳು"
-  },
-  mar: {
-    teacher: "शिक्षक",
-    student: "विद्यार्थी",
-    college: "कॉलेज डेटा",
-    classes: "वर्ग",
-    teacherPlaceholder: "शिक्षकाचे नाव टाका",
-    studentPlaceholder: "विद्यार्थ्याचे नाव टाका",
-    classPlaceholder: "वर्ग जोडा",
-    sendTeacher: "शिक्षकांना सूचना पाठवा",
-    sendStudent: "विद्यार्थ्यांना सूचना पाठवा",
-    excelUpload: "एक्सेल फाइल अपलोड करा (नाव, वर्ग, उपस्थिती, फी, गुण)",
-    summaryTeachers: "एकूण शिक्षक",
-    summaryStudents: "एकूण विद्यार्थी",
-    summaryAttendance: "सरासरी उपस्थिती",
-    summaryFees: "सरासरी फी",
-    summaryMarks: "सरासरी गुण",
-    chartAttendance: "उपस्थिती",
-    chartFees: "फी",
-    chartMarks: "गुण"
-  }
-};
+    <script>
+        const langData = {
+            eng: {
+                teacher: "Teachers",
+                student: "Students",
+                college: "College Data",
+                classes: "Classes",
+                teacherPlaceholder: "Enter Teacher Name",
+                studentPlaceholder: "Enter Student Name",
+                classPlaceholder: "Add Class",
+                sendTeacher: "Send Notification to Teachers",
+                sendStudent: "Send Notification to Students",
+                excelUpload: "Upload Excel File (Name, Class, Attendance, Fees, Marks)",
+                summaryTeachers: "Total Teachers",
+                summaryStudents: "Total Students",
+                summaryAttendance: "Average Attendance",
+                summaryFees: "Average Fees",
+                summaryMarks: "Average Marks",
+                chartAttendance: "Attendance",
+                chartFees: "Fees",
+                chartMarks: "Marks",
+                analyticsDashboard: "Analytics Dashboard"
+            },
+            hin: {
+                teacher: "शिक्षक",
+                student: "छात्र",
+                college: "कॉलेज डेटा",
+                classes: "कक्षाएँ",
+                teacherPlaceholder: "शिक्षक का नाम डालें",
+                studentPlaceholder: "छात्र का नाम डालें",
+                classPlaceholder: "कक्षा जोड़ें",
+                sendTeacher: "शिक्षकों को सूचना भेजें",
+                sendStudent: "छात्रों को सूचना भेजें",
+                excelUpload: "एक्सेल फ़ाइल अपलोड करें (नाम, कक्षा, उपस्थिति, फीस, अंक)",
+                summaryTeachers: "कुल शिक्षक",
+                summaryStudents: "कुल छात्र",
+                summaryAttendance: "औसत उपस्थिति",
+                summaryFees: "औसत फीस",
+                summaryMarks: "औसत अंक",
+                chartAttendance: "उपस्थिति",
+                chartFees: "फीस",
+                chartMarks: "अंक",
+                analyticsDashboard: "एनालिटिक्स डैशबोर्ड"
+            },
+            kan: {
+                teacher: "ಶಿಕ್ಷಕರು",
+                student: "ವಿದ್ಯಾರ್ಥಿಗಳು",
+                college: "ಕಾಲೇಜ್ ಡೇಟಾ",
+                classes: "ವರ್ಗಗಳು",
+                teacherPlaceholder: "ಶಿಕ್ಷಕರ ಹೆಸರು ನಮೂದಿಸಿ",
+                studentPlaceholder: "ವಿದ್ಯಾರ್ಥಿಗಳ ಹೆಸರು ನಮೂದಿಸಿ",
+                classPlaceholder: "ವರ್ಗ ಸೇರಿಸಿ",
+                sendTeacher: "ಶಿಕ್ಷಕರಿಗೆ ಸೂಚನೆ ಕಳುಹಿಸಿ",
+                sendStudent: "ವಿದ್ಯಾರ್ಥಿಗಳಿಗೆ ಸೂಚನೆ ಕಳುಹಿಸಿ",
+                excelUpload: "ಎಕ್ಸೆಲ್ ಫೈಲ್ ಅಪ್ಲೋಡ್ ಮಾಡಿ (ಹೆಸರು, ತರಗತಿ, ಹಾಜರಿ, ಶುಲ್ಕ, ಅಂಕ)",
+                summaryTeachers: "ಒಟ್ಟು ಶಿಕ್ಷಕರು",
+                summaryStudents: "ಒಟ್ಟು ವಿದ್ಯಾರ್ಥಿಗಳು",
+                summaryAttendance: "ಸರಾಸರಿ ಹಾಜರಿ",
+                summaryFees: "ಸರಾಸರಿ ಶುಲ್ಕ",
+                summaryMarks: "ಸರಾಸರಿ ಅಂಕಗಳು",
+                chartAttendance: "ಹಾಜರಿ",
+                chartFees: "ಶುಲ್ಕ",
+                chartMarks: "ಅಂಕಗಳು",
+                analyticsDashboard: "ಅನಾಲಿಟಿಕ್ಸ್ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್"
+            },
+            mar: {
+                teacher: "शिक्षक",
+                student: "विद्यार्थी",
+                college: "कॉलेज डेटा",
+                classes: "वर्ग",
+                teacherPlaceholder: "शिक्षकाचे नाव टाका",
+                studentPlaceholder: "विद्यार्थ्याचे नाव टाका",
+                classPlaceholder: "वर्ग जोडा",
+                sendTeacher: "शिक्षकांना सूचना पाठवा",
+                sendStudent: "विद्यार्थ्यांना सूचना पाठवा",
+                excelUpload: "एक्सेल फाइल अपलोड करा (नाव, वर्ग, उपस्थिती, फी, गुण)",
+                summaryTeachers: "एकूण शिक्षक",
+                summaryStudents: "एकूण विद्यार्थी",
+                summaryAttendance: "सरासरी उपस्थिती",
+                summaryFees: "सरासरी फी",
+                summaryMarks: "सरासरी गुण",
+                chartAttendance: "उपस्थिती",
+                chartFees: "फी",
+                chartMarks: "गुण",
+                analyticsDashboard: "एनालिटिक्स डैशबोर्ड"
+            }
+        };
 
-// Update all text content and placeholders
-function updateLanguage(){
-  const lang = document.getElementById("languageSelect").value;
-  const data = langData[lang];
+        // Update all text content and placeholders
+        function updateLanguage() {
+            const lang = document.getElementById("languageSelect").value;
+            const data = langData[lang];
 
-  document.getElementById("teacherHeader").innerText = data.teacher;
-  document.getElementById("studentHeader").innerText = data.student;
-  document.getElementById("collegeHeader").innerText = data.college;
-  document.getElementById("classesHeader").innerText = data.classes;
+            // FIX: Using innerHTML to preserve the Font Awesome icons 
+            document.getElementById("teacherHeader").innerHTML = `<i class="fas fa-chalkboard-teacher"></i> ${data.teacher}`;
+            document.getElementById("studentHeader").innerHTML = `<i class="fas fa-user-graduate"></i> ${data.student}`;
+            document.getElementById("collegeHeader").innerHTML = `<i class="fas fa-university"></i> ${data.college}`;
+            document.getElementById("classesHeader").innerHTML = `<i class="fas fa-school"></i> ${data.classes}`;
 
-  document.getElementById("teacherName").placeholder = data.teacherPlaceholder;
-  document.getElementById("studentName").placeholder = data.studentPlaceholder;
-  document.getElementById("className").placeholder = data.classPlaceholder;
+            // Update Analytics Dashboard Heading (Preserves Icon)
+            document.querySelector(".lg\\:col-span-3 .text-green-300").innerHTML = `<i class="fas fa-chart-line"></i> ${data.analyticsDashboard}`;
 
-  document.getElementById("teacherNotifyBtn").innerHTML = `<i class="fas fa-bell"></i> ${data.sendTeacher}`;
-  document.getElementById("studentNotifyBtn").innerHTML = `<i class="fas fa-bell"></i> ${data.sendStudent}`;
-  document.getElementById("excelUploadText").innerText = data.excelUpload;
+            document.getElementById("teacherName").placeholder = data.teacherPlaceholder;
+            document.getElementById("studentName").placeholder = data.studentPlaceholder;
+            document.getElementById("className").placeholder = data.classPlaceholder;
 
-  // Summary cards
-  const summaryCards = document.querySelectorAll(".lg\\:col-span-3 > div h3");
-  summaryCards[0].innerText = data.summaryTeachers;
-  summaryCards[1].innerText = data.summaryStudents;
-  summaryCards[2].innerText = data.summaryAttendance;
-  summaryCards[3].innerText = data.summaryFees;
-  summaryCards[4].innerText = data.summaryMarks;
+            document.getElementById("teacherNotifyBtn").innerHTML = `<i class="fas fa-bell"></i> ${data.sendTeacher}`;
+            document.getElementById("studentNotifyBtn").innerHTML = `<i class="fas fa-bell"></i> ${data.sendStudent}`;
+            document.getElementById("excelUploadText").innerText = data.excelUpload;
 
-  // Analytics chart headings
-  const chartTitles = [data.chartAttendance, data.chartFees, data.chartMarks];
-  const chartContainers = document.querySelectorAll(".bg-gray-700 h3");
-  chartContainers.forEach((h3, index) => {
-    if(index<3) h3.innerText = chartTitles[index];
-  });
+            // Summary cards
+            const summaryCards = document.querySelectorAll(".lg\\:col-span-3 > div h3");
+            summaryCards[0].innerText = data.summaryTeachers;
+            summaryCards[1].innerText = data.summaryStudents;
+            summaryCards[2].innerText = data.summaryAttendance;
+            summaryCards[3].innerText = data.summaryFees;
+            summaryCards[4].innerText = data.summaryMarks;
 
-  // Update chart labels
-  if(attendanceChart) { attendanceChart.data.datasets[0].label = data.chartAttendance; attendanceChart.update(); }
-  if(feesChart) { feesChart.data.datasets[0].label = data.chartFees; feesChart.update(); }
-  if(marksChart) { marksChart.data.datasets[0].label = data.chartMarks; marksChart.update(); }
-}
+            // Analytics chart headings (Attendance, Fees, Marks)
+            const chartTitles = [data.chartAttendance, data.chartFees, data.chartMarks];
+            const chartContainers = document.querySelectorAll(".bg-gray-700 h3");
+            chartContainers.forEach((h3, index) => {
+                if (index < 3) h3.innerText = chartTitles[index];
+            });
 
-document.getElementById("languageSelect").addEventListener("change", updateLanguage);
+            // Update chart labels inside Chart.js
+            if (attendanceChart) { attendanceChart.data.datasets[0].label = data.chartAttendance; attendanceChart.update(); }
+            if (feesChart) { feesChart.data.datasets[0].label = data.chartFees; feesChart.update(); }
+            if (marksChart) { marksChart.data.datasets[0].label = data.chartMarks; marksChart.update(); }
+        }
 
-// LocalStorage helper functions
-function getData(key){ return JSON.parse(localStorage.getItem(key))||[]; }
-function setData(key,data){ localStorage.setItem(key, JSON.stringify(data)); }
+        document.getElementById("languageSelect").addEventListener("change", updateLanguage);
 
-function renderList(key,listId){
-  const data=getData(key);
-  const list=document.getElementById(listId);
-  list.innerHTML="";
-  data.forEach((item,index)=>{
-    const li=document.createElement("li");
-    li.className="flex justify-between items-center bg-gray-700 px-3 py-2 rounded";
-    li.innerHTML=`<span>${item}</span>
-      <button onclick="deleteItem('${key}',${index},'${listId}')" class="text-red-400 hover:text-red-600">
-        <i class="fas fa-trash"></i>
-      </button>`;
-    list.appendChild(li);
-  });
-  updateSummary();
-}
+        // LocalStorage helper functions
+        function getData(key) { return JSON.parse(localStorage.getItem(key)) || []; }
+        function setData(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
 
-function deleteItem(key,index,listId){
-  const data=getData(key);
-  data.splice(index,1);
-  setData(key,data);
-  renderList(key,listId);
-  showToast("Deleted successfully!");
-  updateCharts();
-}
+        function renderList(key, listId) {
+            const data = getData(key);
+            const list = document.getElementById(listId);
+            list.innerHTML = "";
+            data.forEach((item, index) => {
+                const li = document.createElement("li");
+                li.className = "flex justify-between items-center bg-gray-700 px-3 py-2 rounded";
+                li.innerHTML = `<span>${item}</span>
+      <button onclick="deleteItem('${key}',${index},'${listId}')" class="text-red-400 hover:text-red-600">
+        <i class="fas fa-trash"></i>
+      </button>`;
+                list.appendChild(li);
+            });
+            updateSummary();
+        }
 
-document.getElementById("teacherForm").addEventListener("submit",e=>{
-  e.preventDefault();
-  const name=document.getElementById("teacherName").value;
-  const teachers=getData("teachers");
-  teachers.push(name);
-  setData("teachers",teachers);
-  renderList("teachers","teacherList");
-  e.target.reset();
-  showToast("Teacher added!");
-  updateCharts();
-});
+        function deleteItem(key, index, listId) {
+            const data = getData(key);
+            data.splice(index, 1);
+            setData(key, data);
+            renderList(key, listId);
+            showToast("Deleted successfully!");
+            updateCharts();
+        }
 
-document.getElementById("studentForm").addEventListener("submit",e=>{
-  e.preventDefault();
-  const name=document.getElementById("studentName").value;
-  const students=getData("students");
-  students.push(name);
-  setData("students",students);
-  renderList("students","studentList");
-  e.target.reset();
-  showToast("Student added!");
-  updateCharts();
-});
+        document.getElementById("teacherForm").addEventListener("submit", e => {
+            e.preventDefault();
+            const name = document.getElementById("teacherName").value;
+            const teachers = getData("teachers");
+            teachers.push(name);
+            setData("teachers", teachers);
+            renderList("teachers", "teacherList");
+            e.target.reset();
+            showToast("Teacher added!");
+            updateCharts();
+        });
 
-document.getElementById("classForm").addEventListener("submit",e=>{
-  e.preventDefault();
-  const name=document.getElementById("className").value;
-  const classes=getData("classes");
-  classes.push(name);
-  setData("classes",classes);
-  renderList("classes","classList");
-  e.target.reset();
-});
+        document.getElementById("studentForm").addEventListener("submit", e => {
+            e.preventDefault();
+            const name = document.getElementById("studentName").value;
+            const students = getData("students");
+            students.push(name);
+            setData("students", students);
+            renderList("students", "studentList");
+            e.target.reset();
+            showToast("Student added!");
+            updateCharts();
+        });
 
-function sendNotification(role){ showToast(`${role} Notification Sent!`); }
+        document.getElementById("classForm").addEventListener("submit", e => {
+            e.preventDefault();
+            const name = document.getElementById("className").value;
+            const classes = getData("classes");
+            classes.push(name);
+            setData("classes", classes);
+            renderList("classes", "classList");
+            e.target.reset();
+        });
 
-function showToast(message){
-  const container=document.getElementById("toastContainer");
-  const toast=document.createElement("div");
-  toast.className="toast bg-purple-600 text-white px-4 py-2 rounded shadow show";
-  toast.innerText=message;
-  container.appendChild(toast);
-  setTimeout(()=>toast.remove(),3000);
-}
+        function sendNotification(role) { showToast(`${role} Notification Sent!`); }
 
-// Summary Cards
-function updateSummary(excelData=[]){
-  document.getElementById("totalTeachers").innerText = getData("teachers").length;
-  document.getElementById("totalStudents").innerText = getData("students").length;
-  if(excelData.length>0){
-    const attendance = excelData.reduce((sum,r)=>sum+(parseFloat(r.Attendance)||0),0)/excelData.length;
-    const fees = excelData.reduce((sum,r)=>sum+(parseFloat(r.Fees)||0),0)/excelData.length;
-    const marks = excelData.reduce((sum,r)=>sum+(parseFloat(r.Marks)||0),0)/excelData.length;
-    document.getElementById("avgAttendance").innerText = attendance.toFixed(1);
-    document.getElementById("avgFees").innerText = fees.toFixed(1);
-    document.getElementById("avgMarks").innerText = marks.toFixed(1);
-  }
-}
+        function showToast(message) {
+            const container = document.getElementById("toastContainer");
+            const toast = document.createElement("div");
+            toast.className = "toast bg-purple-600 text-white px-4 py-2 rounded shadow show";
+            toast.innerText = message;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
 
-// Excel Upload
-document.getElementById("excelFile").addEventListener("change",e=>{
-  const file=e.target.files[0];
-  if(!file) return;
-  const reader=new FileReader();
-  reader.onload=function(evt){
-    const data=evt.target.result;
-    const workbook=XLSX.read(data,{type:'binary'});
-    const sheetName=workbook.SheetNames[0];
-    const sheet=XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
-    renderExcel(sheet);
-  };
-  reader.readAsBinaryString(file);
-});
+        // Summary Cards
+        function updateSummary(excelData = []) {
+            document.getElementById("totalTeachers").innerText = getData("teachers").length;
+            document.getElementById("totalStudents").innerText = getData("students").length;
+            if (excelData.length > 0) {
+                const attendance = excelData.reduce((sum, r) => sum + (parseFloat(r.Attendance) || 0), 0) / excelData.length;
+                const fees = excelData.reduce((sum, r) => sum + (parseFloat(r.Fees) || 0), 0) / excelData.length;
+                const marks = excelData.reduce((sum, r) => sum + (parseFloat(r.Marks) || 0), 0) / excelData.length;
+                document.getElementById("avgAttendance").innerText = attendance.toFixed(1);
+                document.getElementById("avgFees").innerText = fees.toFixed(1);
+                document.getElementById("avgMarks").innerText = marks.toFixed(1);
+            }
+        }
 
-function renderExcel(data){
-  const container=document.getElementById("excelOutput");
-  if(data.length===0){ container.innerHTML="<p>No Data</p>"; return; }
-  let html="<table class='min-w-full border border-gray-600'><tr>";
-  Object.keys(data[0]).forEach(h=>{ html+=`<th class='border border-gray-500 px-2 py-1'>${h}</th>`; });
-  html+="</tr>";
-  data.forEach(r=>{
-    html+="<tr>";
-    Object.values(r).forEach(v=>{ html+=`<td class='border border-gray-500 px-2 py-1'>${v}</td>`; });
-    html+="</tr>";
-  });
-  html+="</table>";
-  container.innerHTML=html;
-  updateSummary(data);
-  updateCharts(data);
-}
+        // Excel Upload
+        document.getElementById("excelFile").addEventListener("change", e => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function (evt) {
+                const data = evt.target.result;
+                const workbook = XLSX.read(data, { type: 'binary' });
+                const sheetName = workbook.SheetNames[0];
+                const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
+                renderExcel(sheet);
+            };
+            reader.readAsBinaryString(file);
+        });
 
-// Charts
-let attendanceChart, feesChart, marksChart;
-function updateCharts(excelData=[]){
-  const labels = excelData.length? excelData.map((r,i)=>r.Name||`Student ${i+1}`): [];
-  const attendanceData = excelData.length? excelData.map(r=>parseFloat(r.Attendance)||0): [];
-  const feesData = excelData.length? excelData.map(r=>parseFloat(r.Fees)||0): [];
-  const marksData = excelData.length? excelData.map(r=>parseFloat(r.Marks)||0): [];
+        function renderExcel(data) {
+            const container = document.getElementById("excelOutput");
+            if (data.length === 0) { container.innerHTML = "<p>No Data</p>"; return; }
+            let html = "<table class='min-w-full border border-gray-600'><tr>";
+            Object.keys(data[0]).forEach(h => { html += `<th class='border border-gray-500 px-2 py-1'>${h}</th>`; });
+            html += "</tr>";
+            data.forEach(r => {
+                html += "<tr>";
+                Object.values(r).forEach(v => { html += `<td class='border border-gray-500 px-2 py-1'>${v}</td>`; });
+                html += "</tr>";
+            });
+            html += "</table>";
+            container.innerHTML = html;
+            updateSummary(data);
+            updateCharts(data);
+        }
 
-  const ctx1=document.getElementById("attendanceChart").getContext("2d");
-  const ctx2=document.getElementById("feesChart").getContext("2d");
-  const ctx3=document.getElementById("marksChart").getContext("2d");
+        // Charts
+        let attendanceChart, feesChart, marksChart;
+        function updateCharts(excelData = []) {
+            const labels = excelData.length ? excelData.map((r, i) => r.Name || `Student ${i + 1}`) : [];
+            const attendanceData = excelData.length ? excelData.map(r => parseFloat(r.Attendance) || 0) : [];
+            const feesData = excelData.length ? excelData.map(r => parseFloat(r.Fees) || 0) : [];
+            const marksData = excelData.length ? excelData.map(r => parseFloat(r.Marks) || 0) : [];
 
-  const lang = document.getElementById("languageSelect").value;
-  const data = langData[lang];
+            const ctx1 = document.getElementById("attendanceChart").getContext("2d");
+            const ctx2 = document.getElementById("feesChart").getContext("2d");
+            const ctx3 = document.getElementById("marksChart").getContext("2d");
 
-  if(attendanceChart) attendanceChart.destroy();
-  if(feesChart) feesChart.destroy();
-  if(marksChart) marksChart.destroy();
+            const lang = document.getElementById("languageSelect").value;
+            const data = langData[lang];
 
-  attendanceChart = new Chart(ctx1,{
-    type:'bar',
-    data:{ labels, datasets:[{ label:data.chartAttendance, data:attendanceData, backgroundColor:'rgba(255, 206, 86, 0.7)' }] },
-    options:{ responsive:true, plugins:{ legend:{ display:true } }, scales:{ y:{ beginAtZero:true } } }
-  });
+            if (attendanceChart) attendanceChart.destroy();
+            if (feesChart) feesChart.destroy();
+            if (marksChart) marksChart.destroy();
 
-  feesChart = new Chart(ctx2,{
-    type:'bar',
-    data:{ labels, datasets:[{ label:data.chartFees, data:feesData, backgroundColor:'rgba(255, 99, 132, 0.7)' }] },
-    options:{ responsive:true, plugins:{ legend:{ display:true } }, scales:{ y:{ beginAtZero:true } } }
-  });
+            attendanceChart = new Chart(ctx1, {
+                type: 'bar',
+                data: { labels, datasets: [{ label: data.chartAttendance, data: attendanceData, backgroundColor: 'rgba(255, 206, 86, 0.7)' }] },
+                options: { responsive: true, plugins: { legend: { display: true } }, scales: { y: { beginAtZero: true } } }
+            });
 
-  marksChart = new Chart(ctx3,{
-    type:'bar',
-    data:{ labels, datasets:[{ label:data.chartMarks, data:marksData, backgroundColor:'rgba(54, 162, 235, 0.7)' }] },
-    options:{ responsive:true, plugins:{ legend:{ display:true } }, scales:{ y:{ beginAtZero:true } } }
-  });
-}
+            feesChart = new Chart(ctx2, {
+                type: 'bar',
+                data: { labels, datasets: [{ label: data.chartFees, data: feesData, backgroundColor: 'rgba(255, 99, 132, 0.7)' }] },
+                options: { responsive: true, plugins: { legend: { display: true } }, scales: { y: { beginAtZero: true } } }
+            });
 
-// Initial render
-renderList("teachers","teacherList");
-renderList("students","studentList");
-renderList("classes","classList");
-updateLanguage();
-  </script>
+            marksChart = new Chart(ctx3, {
+                type: 'bar',
+                data: { labels, datasets: [{ label: data.chartMarks, data: marksData, backgroundColor: 'rgba(54, 162, 235, 0.7)' }] },
+                options: { responsive: true, plugins: { legend: { display: true } }, scales: { y: { beginAtZero: true } } }
+            });
+        }
 
+        // Initial render
+        renderList("teachers", "teacherList");
+        renderList("students", "studentList");
+        renderList("classes", "classList");
+        updateLanguage();
+    </script>
 </body>
 </html>
