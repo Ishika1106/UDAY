@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parent Dashboard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+body { background: linear-gradient(135deg,#0a0a0a,#1e003e,#001a33); color:#fff; font-family:sans-serif; }
+.toast { position: fixed; bottom: 20px; right: 20px; background:#7f00ff; padding:10px 20px; border-radius:8px; opacity:0; transform:translateY(20px); transition:all 0.3s; z-index:1000;}
+.toast.show { opacity:1; transform:translateY(0);}
+</style>
+</head>
+<body class="min-h-screen p-6">
+
+<h1 class="text-3xl font-bold mb-6 text-purple-400">Parent Dashboard</h1>
+
+<!-- Select Student -->
+<div class="mb-6">
+  <input type="text" id="parentStudentInput" placeholder="Enter your child’s name" class="p-2 rounded bg-gray-700 text-white w-full">
+  <button onclick="loadChildData()" class="mt-2 w-full bg-purple-600 hover:bg-purple-700 p-2 rounded">Load Student</button>
+</div>
+
+<!-- Student Performance -->
+<section class="mb-6 bg-gray-800 p-4 rounded-xl shadow-lg">
+  <h2 class="text-2xl font-bold text-green-300 mb-2">Student Performance</h2>
+  <div id="childInfo" class="mb-2"></div>
+  <canvas id="childChart" height="200"></canvas>
+</section>
+
+<!-- Book Session -->
+<section class="mb-6 bg-gray-800 p-4 rounded-xl shadow-lg">
+  <h2 class="text-2xl font-bold text-blue-300 mb-2">Book a Session</h2>
+  <select id="sessionSelect" class="w-full p-2 rounded bg-gray-700 text-white mb-2">
+    <option value="">Select Session</option>
+  </select>
+  <button onclick="bookSession()" class="w-full bg-purple-600 hover:bg-purple-700 p-2 rounded">Book Session</button>
+</section>
+
+<!-- Notifications -->
+<section class="bg-gray-800 p-4 rounded-xl shadow-lg">
+  <h2 class="text-2xl font-bold text-yellow-300 mb-2">Notifications</h2>
+  <ul id="notificationList" class="list-disc pl-5"></ul>
+</section>
+
+<!-- Toast -->
+<div id="toastContainer"></div>
+
+<script>
+// Toast
+function showToast(msg){
+  const toast=document.createElement("div");
+  toast.className="toast show text-white";
+  toast.innerText=msg;
+  document.getElementById("toastContainer").appendChild(toast);
+  setTimeout(()=>toast.remove(),3000);
+}
+
+// Load Student Data
+let childData=null;
+function loadChildData(){
+  const name=document.getElementById("parentStudentInput").value.trim();
+  if(!name){ alert("Enter student name"); return; }
+  const excelData=JSON.parse(localStorage.getItem("excelData"))||[];
+  childData=excelData.find(s=>s.Name.toLowerCase()===name.toLowerCase());
+  if(!childData){ alert("Student not found"); return; }
+
+  // Load sessions
+  const sessionSelect=document.getElementById("sessionSelect");
+  sessionSelect.innerHTML='<option value="">Select Session</option>';
+  const sessions=JSON.parse(localStorage.getItem("sessions"))||[];
+  sessions.forEach(s=>{ const opt=document.createElement("option"); opt.value=s; opt.innerText=s; sessionSelect.appendChild(opt); });
+
+  displayChildInfo();
+}
+
+// Display child performance
+let childChart=null;
+function displayChildInfo(){
+  if(!childData) return;
+  const attendanceData=JSON.parse(localStorage.getItem("attendance"))||[];
+  const totalAttendance=attendanceData.filter(a=>a.student===childData.Name).length;
+
+  document.getElementById("childInfo").innerHTML=`
+    <p><strong>Name:</strong> ${childData.Name}</p>
+    <p><strong>Class:</strong> ${childData.Class || 'N/A'}</p>
+    <p><strong>Attendance:</strong> ${totalAttendance}</p>
+    <p><strong>Marks:</strong> ${childData.Marks || 'N/A'}</p>
+    <p><strong>Fees Status:</strong> ${childData.FeesStatus || 'N/A'}</p>
+  `;
+
+  const paid=(childData.FeesStatus?.toLowerCase()==='paid')?1:0;
+  const unpaid=(childData.FeesStatus?.toLowerCase()!=='paid')?1:0;
+
+  if(childChart) childChart.destroy();
+  const ctx=document.getElementById("childChart").getContext("2d");
+  childChart=new Chart(ctx,{
+    type:'pie',
+    data:{
+      labels:['Attendance','Marks','Fees Paid','Fees Not Paid'],
+      datasets:[{data:[totalAttendance,childData.Marks||0,paid,unpaid],backgroundColor:['#7f00ff','#00bfff','#00ff7f','#ff1a75']}]
+    },
+    options:{responsive:true}
+  });
+}
+
+// Book session
+function bookSession(){
+  if(!childData){ alert("Load student first"); return; }
+  const session=document.getElementById("sessionSelect").value;
+  if(!session){ alert("Select a session"); return; }
+  let bookings=JSON.parse(localStorage.getItem("bookings"))||[];
+  bookings.push({student:childData.Name,session,date:new Date().toLocaleString()});
+  localStorage.setItem("bookings",JSON.stringify(bookings));
+  showToast(`Session "${session}" booked successfully!`);
+}
+
+// Show notifications
+function loadNotifications(){
+  const notifications=[
+    "Parent-teacher meeting on Friday",
+    "School will be closed next Monday",
+    "New session added by teacher"
+  ];
+  const ul=document.getElementById("notificationList");
+  ul.innerHTML="";
+  notifications.forEach(n=>{
+    const li=document.createElement("li");
+    li.innerText=n;
+    ul.appendChild(li);
+  });
+}
+
+loadNotifications();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Uday - Unified Dropout Analysis for Youth</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Fade + slide animation */
+    @keyframes fadeSlide {
+      0% { opacity: 0; transform: translateY(-20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .fade-slide { animation: fadeSlide 1.2s ease-in-out; }
+
+    /* Floating animation */
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    .float { animation: float 3s ease-in-out infinite; }
+
+    /* Neon Glow animation */
+    @keyframes neonGlow {
+      0%, 100% { box-shadow: 0 0 15px rgba(168,85,247,0.6), 0 0 30px rgba(59,130,246,0.6); }
+      50% { box-shadow: 0 0 25px rgba(168,85,247,0.9), 0 0 45px rgba(59,130,246,0.9); }
+    }
+    .glow { animation: neonGlow 2.5s ease-in-out infinite; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center font-sans 
+             bg-gradient-to-br from-black via-gray-900 to-purple-950 text-white">
+
+  <!-- Heading -->
+  <header class="mb-8 text-center fade-slide">
+    <h1 class="text-5xl font-extrabold text-purple-400 drop-shadow-lg">Uday</h1>
+    <p id="subtitle" class="text-blue-300 mt-3 text-lg">Unified Dropout Analysis for Youth</p>
+  </header>
+
+  <!-- Language Selection -->
+  <div class="mb-10 fade-slide">
+    <label for="language" class="mr-2 text-purple-300 font-medium">🌐 Language:</label>
+    <select id="language" onchange="changeLanguage()" 
+            class="p-2 rounded-lg border border-purple-500 bg-gray-800 text-purple-200 shadow-md hover:shadow-lg transition">
+      <option value="en">English</option>
+      <option value="hi">हिन्दी</option>
+      <option value="kn">ಕನ್ನಡ</option>
+      <option value="mr">मारवाड़ी</option>
+    </select>
+  </div>
+
+  <!-- Role Selection Blocks -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 w-4/5 max-w-3xl fade-slide">
+    <a href="admin.html" id="adminBlock"
+       class="block float glow bg-gray-900/70 hover:bg-gray-800 rounded-2xl p-10 text-center font-bold text-xl text-purple-300 transition transform hover:scale-110 hover:-rotate-1">
+      Admin
+    </a>
+    <a href="teacher.html" id="teacherBlock"
+       class="block float glow bg-gray-900/70 hover:bg-gray-800 rounded-2xl p-10 text-center font-bold text-xl text-blue-300 transition transform hover:scale-110 hover:rotate-1">
+      Teacher
+    </a>
+    <a href="student.html" id="studentBlock"
+       class="block float glow bg-gray-900/70 hover:bg-gray-800 rounded-2xl p-10 text-center font-bold text-xl text-purple-300 transition transform hover:scale-110 hover:-rotate-2">
+      Student
+    </a>
+    <a href="parent.html" id="parentBlock"
+       class="block float glow bg-gray-900/70 hover:bg-gray-800 rounded-2xl p-10 text-center font-bold text-xl text-blue-300 transition transform hover:scale-110 hover:rotate-2">
+      Parent
+    </a>
+  </div>
+
+  <!-- Dynamic Language Script -->
+  <script>
+    const translations = {
+      en: {
+        subtitle: "Unified Dropout Analysis for Youth",
+        admin: "Admin",
+        teacher: "Teacher",
+        student: "Student",
+        parent: "Parent"
+      },
+      hi: {
+        subtitle: "युवा के लिए एकीकृत ड्रॉपआउट विश्लेषण",
+        admin: "प्रशासक",
+        teacher: "शिक्षक",
+        student: "छात्र",
+        parent: "अभिभावक"
+      },
+      kn: {
+        subtitle: "ಯುವಕರಿಗಾಗಿ ಏಕೀಕೃತ ಹೊರಗುಳಿಯುವ ವಿಶ್ಲೇಷಣೆ",
+        admin: "ನಿರ್ವಾಹಕ",
+        teacher: "ಶಿಕ್ಷಕ",
+        student: "ವಿದ್ಯಾರ್ಥಿ",
+        parent: "ಪೋಷಕರು"
+      },
+      mr: {
+        subtitle: "युवांसाठी एकत्रित ड्रॉपआउट विश्लेषण",
+        admin: "प्रशासक",
+        teacher: "शिक्षक",
+        student: "विद्यार्थी",
+        parent: "पालक"
+      }
+    };
+
+    function changeLanguage() {
+      const lang = document.getElementById("language").value;
+      document.getElementById("subtitle").innerText = translations[lang].subtitle;
+      document.getElementById("adminBlock").innerText = translations[lang].admin;
+      document.getElementById("teacherBlock").innerText = translations[lang].teacher;
+      document.getElementById("studentBlock").innerText = translations[lang].student;
+      document.getElementById("parentBlock").innerText = translations[lang].parent;
+    }
+  </script>
+
+</body>
+</html>

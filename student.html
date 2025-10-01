@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Dashboard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+body { background: linear-gradient(135deg,#0a0a0a,#1e003e,#001a33); color:#fff; font-family:sans-serif; }
+.chat-widget { position: fixed; bottom: 20px; right: 20px; width: 320px; max-height: 400px; border: 2px solid #7f00ff; border-radius: 12px; overflow: hidden; background:#1e003e; display:flex; flex-direction:column; box-shadow:0 0 20px #7f00ff; z-index:1000; }
+.chat-header { background:#7f00ff; padding:10px; text-align:center; font-weight:bold; border-bottom:1px solid #fff; cursor:pointer; }
+.chat-box { flex:1; padding:10px; overflow-y:auto; }
+.chat-input-container { display:flex; border-top:1px solid #7f00ff; }
+.chat-input { flex:1; padding:10px; border:none; outline:none; background:#0d0d2b; color:#fff; }
+.chat-send-btn { padding:10px 15px; background:#00bfff; border:none; cursor:pointer; }
+.message { margin:5px 0; padding:5px 10px; border-radius:12px; max-width:80%; word-wrap:break-word; }
+.user { background:#7f00ff; text-align:right; margin-left:auto; }
+.bot { background:#00bfff; text-align:left; margin-right:auto; }
+</style>
+</head>
+<body class="min-h-screen p-6">
+
+<h1 class="text-3xl font-bold mb-6 text-purple-400">Student Dashboard</h1>
+
+<!-- Select Student -->
+<div class="mb-4">
+  <input type="text" id="studentNameInput" placeholder="Enter your name" class="p-2 rounded bg-gray-700 text-white w-full">
+  <button onclick="loadStudentData()" class="mt-2 w-full bg-purple-600 hover:bg-purple-700 p-2 rounded">Load My Data</button>
+</div>
+
+<!-- Sessions -->
+<section class="mb-6 bg-gray-800 p-4 rounded-xl shadow-lg">
+  <h2 class="text-2xl font-bold text-blue-300 mb-2">My Sessions</h2>
+  <select id="sessionSelect" class="w-full p-2 rounded bg-gray-700 text-white mb-2">
+    <option value="">Select Session</option>
+  </select>
+</section>
+
+<!-- Student Data -->
+<section class="mb-6 bg-gray-800 p-4 rounded-xl shadow-lg">
+  <h2 class="text-2xl font-bold text-green-300 mb-2">My Data</h2>
+  <div id="studentInfo" class="mb-2"></div>
+  <canvas id="studentChart" height="200"></canvas>
+</section>
+
+<!-- Floating Chatbot -->
+<div class="chat-widget" id="chatWidget">
+  <div class="chat-header" onclick="toggleChat()">💬 Chatbot</div>
+  <div class="chat-box" id="chatBox"></div>
+  <div class="chat-input-container">
+    <input type="text" id="chatInput" class="chat-input" placeholder="Type your message...">
+    <button class="chat-send-btn" onclick="sendMessage()">Send</button>
+  </div>
+</div>
+
+<script>
+// Load sessions and data from localStorage
+let studentData=null;
+
+function loadStudentData(){
+  const name=document.getElementById("studentNameInput").value.trim();
+  if(!name){ alert("Enter your name"); return; }
+  const excelData=JSON.parse(localStorage.getItem("excelData"))||[];
+  studentData=excelData.find(s=>s.Name.toLowerCase()===name.toLowerCase());
+  if(!studentData){ alert("Student not found"); return; }
+
+  const sessionSelect=document.getElementById("sessionSelect");
+  sessionSelect.innerHTML='<option value="">Select Session</option>';
+  const sessions=JSON.parse(localStorage.getItem("sessions"))||[];
+  sessions.forEach(s=>{ const opt=document.createElement("option"); opt.value=s; opt.innerText=s; sessionSelect.appendChild(opt); });
+  displayStudentInfo();
+  appendMessage(`Hello ${studentData.Name}! I am your dashboard assistant. Ask me about attendance, marks, fees, sessions, or tips!`,'bot');
+}
+
+document.getElementById("sessionSelect").addEventListener("change",displayStudentInfo);
+
+function displayStudentInfo(){
+  if(!studentData) return;
+  const session=document.getElementById("sessionSelect").value;
+  const attendance=JSON.parse(localStorage.getItem("attendance"))||[];
+  const sessionAttendance=attendance.filter(a=>a.student===studentData.Name && (!session || a.session===session)).length;
+  document.getElementById("studentInfo").innerHTML=`
+    <p><strong>Name:</strong> ${studentData.Name}</p>
+    <p><strong>Class:</strong> ${studentData.Class || 'N/A'}</p>
+    <p><strong>Attendance in session:</strong> ${sessionAttendance}</p>
+    <p><strong>Marks:</strong> ${studentData.Marks || 'N/A'}</p>
+    <p><strong>Fees Status:</strong> ${studentData.FeesStatus || 'N/A'}</p>
+  `;
+  renderStudentChart(sessionAttendance, studentData.Marks || 0, studentData.FeesStatus);
+}
+
+// Render pie chart
+let studentChart=null;
+function renderStudentChart(attendance, marks, fees){
+  const paid=(fees.toLowerCase()==='paid')?1:0;
+  const unpaid=(fees.toLowerCase()!=='paid')?1:0;
+  if(studentChart) studentChart.destroy();
+  const ctx=document.getElementById("studentChart").getContext("2d");
+  studentChart=new Chart(ctx,{
+    type:'pie',
+    data:{
+      labels:['Attendance','Marks','Fees Paid','Fees Not Paid'],
+      datasets:[{data:[attendance,marks,paid,unpaid],backgroundColor:['#7f00ff','#00bfff','#00ff7f','#ff1a75'] }]
+    },
+    options:{responsive:true}
+  });
+}
+
+// Chatbot logic
+const chatBox=document.getElementById("chatBox");
+const chatInput=document.getElementById("chatInput");
+chatInput.addEventListener("keydown", function(e){
+  if(e.key==='Enter') sendMessage();
+});
+
+function sendMessage(){
+  const msg=chatInput.value.trim();
+  if(!msg) return;
+  appendMessage(msg,'user');
+  chatInput.value='';
+  setTimeout(()=>respond(msg),400);
+}
+
+function appendMessage(msg,type){
+  const div=document.createElement("div");
+  div.className=`message ${type}`;
+  div.innerText=msg;
+  chatBox.appendChild(div);
+  chatBox.scrollTop=chatBox.scrollHeight;
+}
+
+// chatbot responses
+function respond(msg){
+  if(!studentData){ appendMessage("Please load your data first!",'bot'); return; }
+  msg=msg.toLowerCase();
+  let reply="I am not sure about that. Try asking about attendance, marks, fees, sessions, or tips.";
+
+  if(msg.includes("attendance")) {
+    const attendance=JSON.parse(localStorage.getItem("attendance"))||[];
+    const count=attendance.filter(a=>a.student===studentData.Name).length;
+    reply=`Your total attendance is ${count} days.`;
+  } 
+  else if(msg.includes("marks")) {
+    reply=`Your marks are ${studentData.Marks || 'N/A'}.`;
+  } 
+  else if(msg.includes("fees")) {
+    reply=`Your fees status is: ${studentData.FeesStatus || 'N/A'}.`;
+  } 
+  else if(msg.includes("session")) {
+    const sessions=JSON.parse(localStorage.getItem("sessions"))||[];
+    reply=sessions.length>0 ? `Your sessions are: ${sessions.join(', ')}.` : "No sessions available yet.";
+  } 
+  else if(msg.includes("risk") || msg.includes("dropout")) {
+    const risk=Math.floor(Math.random()*50+50);
+    reply=`Based on attendance and marks, your dropout risk is approximately ${risk}%.`;
+  } 
+  else if(msg.includes("hi") || msg.includes("hello")) {
+    reply=`Hello ${studentData.Name}! How can I assist you today?`;
+  } 
+  else if(msg.includes("tip") || msg.includes("advice")) {
+    const tips=["Attend all sessions regularly!","Review your notes daily.","Clear doubts with your teacher.","Pay your fees on time to avoid issues."];
+    reply=tips[Math.floor(Math.random()*tips.length)];
+  }
+
+  appendMessage(reply,'bot');
+}
+
+// toggle chat visibility
+function toggleChat(){
+  const widget=document.getElementById("chatWidget");
+  const chatBoxDiv=widget.querySelector(".chat-box");
+  const inputDiv=widget.querySelector(".chat-input-container");
+  if(chatBoxDiv.style.display==="none"){
+    chatBoxDiv.style.display="block";
+    inputDiv.style.display="flex";
+  } else {
+    chatBoxDiv.style.display="none";
+    inputDiv.style.display="none";
+  }
+}
+</script>
+
+</body>
+</html>
