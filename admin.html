@@ -31,7 +31,6 @@
   </header>
 
   <main class="p-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
-
     <!-- Teacher Section -->
     <section class="bg-gray-800 rounded-xl p-6 shadow-lg">
       <h2 id="teacherHeader" class="text-2xl font-bold mb-4 text-purple-300"><i class="fas fa-chalkboard-teacher"></i> Teachers</h2>
@@ -60,14 +59,14 @@
 
     <!-- College Data Section -->
     <section class="bg-gray-800 rounded-xl p-6 shadow-lg">
-      <h2 class="text-2xl font-bold mb-4 text-pink-300"><i class="fas fa-university"></i> College Data</h2>
+      <h2 id="collegeHeader" class="text-2xl font-bold mb-4 text-pink-300"><i class="fas fa-university"></i> College Data</h2>
       <div class="border-2 border-dashed border-gray-600 p-6 text-center rounded-lg">
         <i class="fas fa-file-excel text-green-400 text-4xl mb-2"></i>
-        <p class="mb-2">Upload Excel File (Name, Class, Attendance, Fees, Marks)</p>
+        <p id="excelUploadText" class="mb-2">Upload Excel File (Name, Class, Attendance, Fees, Marks)</p>
         <input type="file" id="excelFile" accept=".xlsx,.xls" class="text-gray-400">
       </div>
       <div id="excelOutput" class="mt-6 overflow-x-auto"></div>
-      <h3 class="text-xl font-semibold mt-6 text-indigo-300"><i class="fas fa-school"></i> Classes</h3>
+      <h3 id="classesHeader" class="text-xl font-semibold mt-6 text-indigo-300"><i class="fas fa-school"></i> Classes</h3>
       <ul id="classList" class="mt-3 space-y-2"></ul>
       <form id="classForm" class="flex gap-2 mt-3">
         <input type="text" id="className" placeholder="Add Class" class="flex-1 p-2 rounded bg-gray-700 text-gray-200" required>
@@ -123,164 +122,294 @@
   <div id="toastContainer" class="fixed bottom-4 right-4 space-y-2 z-50"></div>
 
   <script>
-    const langData = {
-      eng: { teacher: "Teachers", student:"Students", sendTeacher:"Send Notification to Teachers", sendStudent:"Send Notification to Students" },
-      hin: { teacher: "शिक्षक", student:"छात्र", sendTeacher:"शिक्षकों को सूचना भेजें", sendStudent:"छात्रों को सूचना भेजें" },
-      kan: { teacher: "ಶಿಕ್ಷಕರು", student:"ಶಿಷ್ಯರು", sendTeacher:"ಶಿಕ್ಷಕರಿಗೆ ಅಧಿಸೂಚನೆ ಕಳುಹಿಸಿ", sendStudent:"ಶಿಷ್ಯರಿಗೆ ಅಧಿಸೂಚನೆ ಕಳುಹಿಸಿ" },
-      mar: { teacher: "अध्यापक", student:"विद्यार्थी", sendTeacher:"अध्यापकों को सूचना भेजो", sendStudent:"विद्यार्थियों को सूचना भेजो" }
-    };
+const langData = {
+  eng: {
+    teacher: "Teachers",
+    student: "Students",
+    college: "College Data",
+    classes: "Classes",
+    teacherPlaceholder: "Enter Teacher Name",
+    studentPlaceholder: "Enter Student Name",
+    classPlaceholder: "Add Class",
+    sendTeacher: "Send Notification to Teachers",
+    sendStudent: "Send Notification to Students",
+    excelUpload: "Upload Excel File (Name, Class, Attendance, Fees, Marks)",
+    summaryTeachers: "Total Teachers",
+    summaryStudents: "Total Students",
+    summaryAttendance: "Average Attendance",
+    summaryFees: "Average Fees",
+    summaryMarks: "Average Marks",
+    chartAttendance: "Attendance",
+    chartFees: "Fees",
+    chartMarks: "Marks"
+  },
+  hin: {
+    teacher: "शिक्षक",
+    student: "छात्र",
+    college: "कॉलेज डेटा",
+    classes: "कक्षाएँ",
+    teacherPlaceholder: "शिक्षक का नाम डालें",
+    studentPlaceholder: "छात्र का नाम डालें",
+    classPlaceholder: "कक्षा जोड़ें",
+    sendTeacher: "शिक्षकों को सूचना भेजें",
+    sendStudent: "छात्रों को सूचना भेजें",
+    excelUpload: "एक्सेल फ़ाइल अपलोड करें (नाम, कक्षा, उपस्थिति, फीस, अंक)",
+    summaryTeachers: "कुल शिक्षक",
+    summaryStudents: "कुल छात्र",
+    summaryAttendance: "औसत उपस्थिति",
+    summaryFees: "औसत फीस",
+    summaryMarks: "औसत अंक",
+    chartAttendance: "उपस्थिति",
+    chartFees: "फीस",
+    chartMarks: "अंक"
+  },
+  kan: {
+    teacher: "ಶಿಕ್ಷಕರು",
+    student: "ವಿದ್ಯಾರ್ಥಿಗಳು",
+    college: "ಕಾಲೇಜ್ ಡೇಟಾ",
+    classes: "ವರ್ಗಗಳು",
+    teacherPlaceholder: "ಶಿಕ್ಷಕರ ಹೆಸರು ನಮೂದಿಸಿ",
+    studentPlaceholder: "ವಿದ್ಯಾರ್ಥಿಗಳ ಹೆಸರು ನಮೂದಿಸಿ",
+    classPlaceholder: "ವರ್ಗ ಸೇರಿಸಿ",
+    sendTeacher: "ಶಿಕ್ಷಕರಿಗೆ ಸೂಚನೆ ಕಳುಹಿಸಿ",
+    sendStudent: "ವಿದ್ಯಾರ್ಥಿಗಳಿಗೆ ಸೂಚನೆ ಕಳುಹಿಸಿ",
+    excelUpload: "ಎಕ್ಸೆಲ್ ಫೈಲ್ ಅಪ್ಲೋಡ್ ಮಾಡಿ (ಹೆಸರು, ತರಗತಿ, ಹಾಜರಿ, ಶುಲ್ಕ, ಅಂಕ)",
+    summaryTeachers: "ಒಟ್ಟು ಶಿಕ್ಷಕರು",
+    summaryStudents: "ಒಟ್ಟು ವಿದ್ಯಾರ್ಥಿಗಳು",
+    summaryAttendance: "ಸರಾಸರಿ ಹಾಜರಿ",
+    summaryFees: "ಸರಾಸರಿ ಶುಲ್ಕ",
+    summaryMarks: "ಸರಾಸರಿ ಅಂಕಗಳು",
+    chartAttendance: "ಹಾಜರಿ",
+    chartFees: "ಶುಲ್ಕ",
+    chartMarks: "ಅಂಕಗಳು"
+  },
+  mar: {
+    teacher: "शिक्षक",
+    student: "विद्यार्थी",
+    college: "कॉलेज डेटा",
+    classes: "वर्ग",
+    teacherPlaceholder: "शिक्षकाचे नाव टाका",
+    studentPlaceholder: "विद्यार्थ्याचे नाव टाका",
+    classPlaceholder: "वर्ग जोडा",
+    sendTeacher: "शिक्षकांना सूचना पाठवा",
+    sendStudent: "विद्यार्थ्यांना सूचना पाठवा",
+    excelUpload: "एक्सेल फाइल अपलोड करा (नाव, वर्ग, उपस्थिती, फी, गुण)",
+    summaryTeachers: "एकूण शिक्षक",
+    summaryStudents: "एकूण विद्यार्थी",
+    summaryAttendance: "सरासरी उपस्थिती",
+    summaryFees: "सरासरी फी",
+    summaryMarks: "सरासरी गुण",
+    chartAttendance: "उपस्थिती",
+    chartFees: "फी",
+    chartMarks: "गुण"
+  }
+};
 
-    document.getElementById("languageSelect").addEventListener("change", updateLanguage);
+// Update all text content and placeholders
+function updateLanguage(){
+  const lang = document.getElementById("languageSelect").value;
+  const data = langData[lang];
 
-    function updateLanguage(){
-      const lang = document.getElementById("languageSelect").value;
-      document.getElementById("teacherHeader").innerText = langData[lang].teacher;
-      document.getElementById("studentHeader").innerText = langData[lang].student;
-      document.getElementById("teacherNotifyBtn").innerHTML = `<i class="fas fa-bell"></i> ${langData[lang].sendTeacher}`;
-      document.getElementById("studentNotifyBtn").innerHTML = `<i class="fas fa-bell"></i> ${langData[lang].sendStudent}`;
-    }
+  document.getElementById("teacherHeader").innerText = data.teacher;
+  document.getElementById("studentHeader").innerText = data.student;
+  document.getElementById("collegeHeader").innerText = data.college;
+  document.getElementById("classesHeader").innerText = data.classes;
 
-    function getData(key){ return JSON.parse(localStorage.getItem(key))||[]; }
-    function setData(key,data){ localStorage.setItem(key, JSON.stringify(data)); }
+  document.getElementById("teacherName").placeholder = data.teacherPlaceholder;
+  document.getElementById("studentName").placeholder = data.studentPlaceholder;
+  document.getElementById("className").placeholder = data.classPlaceholder;
 
-    function renderList(key,listId){
-      const data=getData(key);
-      const list=document.getElementById(listId);
-      list.innerHTML="";
-      data.forEach((item,index)=>{
-        const li=document.createElement("li");
-        li.className="flex justify-between items-center bg-gray-700 px-3 py-2 rounded";
-        li.innerHTML=`<span>${item}</span>
-          <button onclick="deleteItem('${key}',${index},'${listId}')" class="text-red-400 hover:text-red-600">
-            <i class="fas fa-trash"></i>
-          </button>`;
-        list.appendChild(li);
-      });
-      updateSummary();
-    }
+  document.getElementById("teacherNotifyBtn").innerHTML = `<i class="fas fa-bell"></i> ${data.sendTeacher}`;
+  document.getElementById("studentNotifyBtn").innerHTML = `<i class="fas fa-bell"></i> ${data.sendStudent}`;
+  document.getElementById("excelUploadText").innerText = data.excelUpload;
 
-    function deleteItem(key,index,listId){
-      const data=getData(key);
-      data.splice(index,1);
-      setData(key,data);
-      renderList(key,listId);
-      showToast("Deleted successfully!");
-      updateCharts();
-    }
+  // Summary cards
+  const summaryCards = document.querySelectorAll(".lg\\:col-span-3 > div h3");
+  summaryCards[0].innerText = data.summaryTeachers;
+  summaryCards[1].innerText = data.summaryStudents;
+  summaryCards[2].innerText = data.summaryAttendance;
+  summaryCards[3].innerText = data.summaryFees;
+  summaryCards[4].innerText = data.summaryMarks;
 
-    document.getElementById("teacherForm").addEventListener("submit",e=>{
-      e.preventDefault();
-      const name=document.getElementById("teacherName").value;
-      const teachers=getData("teachers");
-      teachers.push(name);
-      setData("teachers",teachers);
-      renderList("teachers","teacherList");
-      e.target.reset();
-      showToast("Teacher added!");
-      updateCharts();
-    });
+  // Analytics chart headings
+  const chartTitles = [data.chartAttendance, data.chartFees, data.chartMarks];
+  const chartContainers = document.querySelectorAll(".bg-gray-700 h3");
+  chartContainers.forEach((h3, index) => {
+    if(index<3) h3.innerText = chartTitles[index];
+  });
 
-    document.getElementById("studentForm").addEventListener("submit",e=>{
-      e.preventDefault();
-      const name=document.getElementById("studentName").value;
-      const students=getData("students");
-      students.push(name);
-      setData("students",students);
-      renderList("students","studentList");
-      e.target.reset();
-      showToast("Student added!");
-      updateCharts();
-    });
+  // Update chart labels
+  if(attendanceChart) { attendanceChart.data.datasets[0].label = data.chartAttendance; attendanceChart.update(); }
+  if(feesChart) { feesChart.data.datasets[0].label = data.chartFees; feesChart.update(); }
+  if(marksChart) { marksChart.data.datasets[0].label = data.chartMarks; marksChart.update(); }
+}
 
-    document.getElementById("classForm").addEventListener("submit",e=>{
-      e.preventDefault();
-      const name=document.getElementById("className").value;
-      const classes=getData("classes");
-      classes.push(name);
-      setData("classes",classes);
-      renderList("classes","classList");
-      e.target.reset();
-    });
+document.getElementById("languageSelect").addEventListener("change", updateLanguage);
 
-    function sendNotification(role){ showToast(`${role} Notification Sent!`); }
+// LocalStorage helper functions
+function getData(key){ return JSON.parse(localStorage.getItem(key))||[]; }
+function setData(key,data){ localStorage.setItem(key, JSON.stringify(data)); }
 
-    function showToast(message){
-      const container=document.getElementById("toastContainer");
-      const toast=document.createElement("div");
-      toast.className="toast bg-purple-600 text-white px-4 py-2 rounded shadow show";
-      toast.innerText=message;
-      container.appendChild(toast);
-      setTimeout(()=>toast.remove(),3000);
-    }
+function renderList(key,listId){
+  const data=getData(key);
+  const list=document.getElementById(listId);
+  list.innerHTML="";
+  data.forEach((item,index)=>{
+    const li=document.createElement("li");
+    li.className="flex justify-between items-center bg-gray-700 px-3 py-2 rounded";
+    li.innerHTML=`<span>${item}</span>
+      <button onclick="deleteItem('${key}',${index},'${listId}')" class="text-red-400 hover:text-red-600">
+        <i class="fas fa-trash"></i>
+      </button>`;
+    list.appendChild(li);
+  });
+  updateSummary();
+}
 
-    // Summary Cards
-    function updateSummary(excelData=[]){
-      document.getElementById("totalTeachers").innerText = getData("teachers").length;
-      document.getElementById("totalStudents").innerText = getData("students").length;
-      if(excelData.length>0){
-        const attendance = excelData.reduce((sum,r)=>sum+(parseFloat(r.Attendance)||0),0)/excelData.length;
-        const fees = excelData.reduce((sum,r)=>sum+(parseFloat(r.Fees)||0),0)/excelData.length;
-        const marks = excelData.reduce((sum,r)=>sum+(parseFloat(r.Marks)||0),0)/excelData.length;
-        document.getElementById("avgAttendance").innerText = attendance.toFixed(1);
-        document.getElementById("avgFees").innerText = fees.toFixed(1);
-        document.getElementById("avgMarks").innerText = marks.toFixed(1);
-      }
-    }
+function deleteItem(key,index,listId){
+  const data=getData(key);
+  data.splice(index,1);
+  setData(key,data);
+  renderList(key,listId);
+  showToast("Deleted successfully!");
+  updateCharts();
+}
 
-    // Charts
-    let attendanceChart, feesChart, marksChart;
-    function renderCharts(excelData){
-      const classes = [...new Set(excelData.map(r=>r.Class||"Unknown"))];
-      const attendancePerClass = classes.map(cls=>{ const f=excelData.filter(r=>r.Class===cls); return f.reduce((sum,r)=>sum+(parseFloat(r.Attendance)||0),0)/f.length; });
-      const feesPerClass = classes.map(cls=>{ const f=excelData.filter(r=>r.Class===cls); return f.reduce((sum,r)=>sum+(parseFloat(r.Fees)||0),0)/f.length; });
-      const marksPerClass = classes.map(cls=>{ const f=excelData.filter(r=>r.Class===cls); return f.reduce((sum,r)=>sum+(parseFloat(r.Marks)||0),0)/f.length; });
+document.getElementById("teacherForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const name=document.getElementById("teacherName").value;
+  const teachers=getData("teachers");
+  teachers.push(name);
+  setData("teachers",teachers);
+  renderList("teachers","teacherList");
+  e.target.reset();
+  showToast("Teacher added!");
+  updateCharts();
+});
 
-      if(attendanceChart) attendanceChart.destroy();
-      if(feesChart) feesChart.destroy();
-      if(marksChart) marksChart.destroy();
+document.getElementById("studentForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const name=document.getElementById("studentName").value;
+  const students=getData("students");
+  students.push(name);
+  setData("students",students);
+  renderList("students","studentList");
+  e.target.reset();
+  showToast("Student added!");
+  updateCharts();
+});
 
-      const ctxA=document.getElementById("attendanceChart").getContext("2d");
-      attendanceChart = new Chart(ctxA,{ type:'bar', data:{ labels:classes, datasets:[{label:'Average Attendance', data:attendancePerClass, backgroundColor:'#facc15'}] }, options:{responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}} } });
+document.getElementById("classForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const name=document.getElementById("className").value;
+  const classes=getData("classes");
+  classes.push(name);
+  setData("classes",classes);
+  renderList("classes","classList");
+  e.target.reset();
+});
 
-      const ctxF=document.getElementById("feesChart").getContext("2d");
-      feesChart = new Chart(ctxF,{ type:'bar', data:{ labels:classes, datasets:[{label:'Average Fees', data:feesPerClass, backgroundColor:'#ec4899'}] }, options:{responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}} } });
+function sendNotification(role){ showToast(`${role} Notification Sent!`); }
 
-      const ctxM=document.getElementById("marksChart").getContext("2d");
-      marksChart = new Chart(ctxM,{ type:'bar', data:{ labels:classes, datasets:[{label:'Average Marks', data:marksPerClass, backgroundColor:'#3b82f6'}] }, options:{responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}} } });
+function showToast(message){
+  const container=document.getElementById("toastContainer");
+  const toast=document.createElement("div");
+  toast.className="toast bg-purple-600 text-white px-4 py-2 rounded shadow show";
+  toast.innerText=message;
+  container.appendChild(toast);
+  setTimeout(()=>toast.remove(),3000);
+}
 
-      updateSummary(excelData);
-    }
+// Summary Cards
+function updateSummary(excelData=[]){
+  document.getElementById("totalTeachers").innerText = getData("teachers").length;
+  document.getElementById("totalStudents").innerText = getData("students").length;
+  if(excelData.length>0){
+    const attendance = excelData.reduce((sum,r)=>sum+(parseFloat(r.Attendance)||0),0)/excelData.length;
+    const fees = excelData.reduce((sum,r)=>sum+(parseFloat(r.Fees)||0),0)/excelData.length;
+    const marks = excelData.reduce((sum,r)=>sum+(parseFloat(r.Marks)||0),0)/excelData.length;
+    document.getElementById("avgAttendance").innerText = attendance.toFixed(1);
+    document.getElementById("avgFees").innerText = fees.toFixed(1);
+    document.getElementById("avgMarks").innerText = marks.toFixed(1);
+  }
+}
 
-    document.getElementById("excelFile").addEventListener("change",e=>{
-      const file=e.target.files[0];
-      if(!file) return;
-      const reader=new FileReader();
-      reader.onload=function(e){
-        const data=new Uint8Array(e.target.result);
-        const workbook=XLSX.read(data,{type:"array"});
-        const sheetName=workbook.SheetNames[0];
-        const sheet=workbook.Sheets[sheetName];
-        const json=XLSX.utils.sheet_to_json(sheet,{header:1});
-        const headers=json[0];
-        const rows=json.slice(1);
-        const excelObjects = rows.map(r=>{ let obj={}; headers.forEach((h,i)=>obj[h]=r[i]); return obj; });
+// Excel Upload
+document.getElementById("excelFile").addEventListener("change",e=>{
+  const file=e.target.files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=function(evt){
+    const data=evt.target.result;
+    const workbook=XLSX.read(data,{type:'binary'});
+    const sheetName=workbook.SheetNames[0];
+    const sheet=XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
+    renderExcel(sheet);
+  };
+  reader.readAsBinaryString(file);
+});
 
-        let table=`<table class="w-full text-sm border border-gray-600 mt-4">`;
-        json.forEach((row,rowIndex)=>{ table+=`<tr>`; row.forEach(cell=>{ table+=`<${rowIndex===0?"th":"td"} class="border border-gray-600 px-2 py-1">${cell||""}</${rowIndex===0?"th":"td"}>`; }); table+=`</tr>`; });
-        table+=`</table>`;
-        document.getElementById("excelOutput").innerHTML = table;
-        showToast("Excel data loaded!");
-        renderCharts(excelObjects);
-      };
-      reader.readAsArrayBuffer(file);
-    });
+function renderExcel(data){
+  const container=document.getElementById("excelOutput");
+  if(data.length===0){ container.innerHTML="<p>No Data</p>"; return; }
+  let html="<table class='min-w-full border border-gray-600'><tr>";
+  Object.keys(data[0]).forEach(h=>{ html+=`<th class='border border-gray-500 px-2 py-1'>${h}</th>`; });
+  html+="</tr>";
+  data.forEach(r=>{
+    html+="<tr>";
+    Object.values(r).forEach(v=>{ html+=`<td class='border border-gray-500 px-2 py-1'>${v}</td>`; });
+    html+="</tr>";
+  });
+  html+="</table>";
+  container.innerHTML=html;
+  updateSummary(data);
+  updateCharts(data);
+}
 
-    function updateCharts(){ const excelOutput = document.getElementById("excelOutput").querySelector("table"); if(!excelOutput) return; const rows = Array.from(excelOutput.querySelectorAll("tr")).slice(1); const headers = Array.from(excelOutput.querySelectorAll("tr")[0].cells).map(c=>c.innerText); const excelObjects = rows.map(r=>{ let obj={}; Array.from(r.cells).forEach((c,i)=>obj[headers[i]]=c.innerText); return obj; }); renderCharts(excelObjects); }
+// Charts
+let attendanceChart, feesChart, marksChart;
+function updateCharts(excelData=[]){
+  const labels = excelData.length? excelData.map((r,i)=>r.Name||`Student ${i+1}`): [];
+  const attendanceData = excelData.length? excelData.map(r=>parseFloat(r.Attendance)||0): [];
+  const feesData = excelData.length? excelData.map(r=>parseFloat(r.Fees)||0): [];
+  const marksData = excelData.length? excelData.map(r=>parseFloat(r.Marks)||0): [];
 
-    renderList("teachers","teacherList");
-    renderList("students","studentList");
-    renderList("classes","classList");
-    updateLanguage();
+  const ctx1=document.getElementById("attendanceChart").getContext("2d");
+  const ctx2=document.getElementById("feesChart").getContext("2d");
+  const ctx3=document.getElementById("marksChart").getContext("2d");
+
+  const lang = document.getElementById("languageSelect").value;
+  const data = langData[lang];
+
+  if(attendanceChart) attendanceChart.destroy();
+  if(feesChart) feesChart.destroy();
+  if(marksChart) marksChart.destroy();
+
+  attendanceChart = new Chart(ctx1,{
+    type:'bar',
+    data:{ labels, datasets:[{ label:data.chartAttendance, data:attendanceData, backgroundColor:'rgba(255, 206, 86, 0.7)' }] },
+    options:{ responsive:true, plugins:{ legend:{ display:true } }, scales:{ y:{ beginAtZero:true } } }
+  });
+
+  feesChart = new Chart(ctx2,{
+    type:'bar',
+    data:{ labels, datasets:[{ label:data.chartFees, data:feesData, backgroundColor:'rgba(255, 99, 132, 0.7)' }] },
+    options:{ responsive:true, plugins:{ legend:{ display:true } }, scales:{ y:{ beginAtZero:true } } }
+  });
+
+  marksChart = new Chart(ctx3,{
+    type:'bar',
+    data:{ labels, datasets:[{ label:data.chartMarks, data:marksData, backgroundColor:'rgba(54, 162, 235, 0.7)' }] },
+    options:{ responsive:true, plugins:{ legend:{ display:true } }, scales:{ y:{ beginAtZero:true } } }
+  });
+}
+
+// Initial render
+renderList("teachers","teacherList");
+renderList("students","studentList");
+renderList("classes","classList");
+updateLanguage();
   </script>
+
 </body>
 </html>

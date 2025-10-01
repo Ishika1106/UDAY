@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Uday Teacher Dashboard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+body { background: linear-gradient(135deg,#0a0a0a,#1e003e,#001a33); color:#fff; font-family:sans-serif; }
+.toast { position: fixed; bottom: 20px; right: 20px; background: #1e003e; border: 1px solid #7f00ff; padding: 12px 20px; border-radius: 8px; box-shadow:0 0 10px #7f00ff; opacity:0; transform:translateY(20px); transition: all 0.3s ease-in-out; }
+.toast.show { opacity:1; transform:translateY(0); }
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- Header -->
+<header class="p-6 bg-gradient-to-r from-purple-900 to-blue-900 shadow-lg flex flex-col md:flex-row items-center justify-between gap-2 md:gap-0">
+  <h1 class="text-3xl font-extrabold text-purple-400 flex items-center gap-2">
+    <i class="fas fa-chalkboard-teacher"></i> <span id="headerText">Uday Teacher Dashboard</span>
+  </h1>
+  <select id="languageSelect" class="p-2 rounded bg-gray-700 text-white">
+    <option value="en">English</option>
+    <option value="hi">हिन्दी</option>
+    <option value="kn">ಕನ್ನಡ</option>
+    <option value="mr">मराठी</option>
+  </select>
+</header>
+
+<main class="p-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+  <!-- Create Session -->
+  <section class="bg-gray-800 rounded-xl p-6 shadow-lg">
+    <h2 class="text-2xl font-bold mb-4 text-purple-300"><i class="fas fa-calendar-plus"></i> <span data-lang="createSession">Create Session</span></h2>
+    <form id="sessionForm" class="flex gap-2 mb-4">
+      <input type="text" id="sessionName" placeholder="Session Name" class="flex-1 p-2 rounded bg-gray-700 text-gray-200" required>
+      <button type="submit" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded text-white"><i class="fas fa-plus"></i></button>
+    </form>
+    <ul id="sessionList" class="space-y-2"></ul>
+  </section>
+
+  <!-- Student Dropout Risk -->
+  <section class="bg-gray-800 rounded-xl p-6 shadow-lg">
+    <h2 class="text-2xl font-bold mb-4 text-blue-300"><i class="fas fa-user-graduate"></i> <span data-lang="studentRisk">Student Dropout Risk</span></h2>
+    <div class="mb-4">
+      <input type="file" id="riskExcel" accept=".xlsx,.xls" class="text-gray-400 mb-2">
+      <select id="studentSelect" class="w-full p-2 rounded bg-gray-700 text-white">
+        <option value="">Select Student</option>
+      </select>
+      <button onclick="showRisk()" class="mt-2 bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded text-white w-full"><i class="fas fa-chart-pie"></i> <span data-lang="showRisk">Show Risk</span></button>
+    </div>
+    <button onclick="assignRemedial()" class="mb-2 bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded text-black w-full"><i class="fas fa-users-cog"></i> Assign High-Risk to Session</button>
+    <table id="riskTable" class="w-full text-sm mt-4 hidden border border-gray-600"></table>
+  </section>
+
+  <!-- Attendance -->
+  <section class="bg-gray-800 rounded-xl p-6 shadow-lg">
+    <h2 class="text-2xl font-bold mb-4 text-pink-300"><i class="fas fa-user-check"></i> <span data-lang="attendance">Attendance</span></h2>
+    <select id="attendanceSession" class="w-full p-2 rounded bg-gray-700 text-white mb-2">
+      <option value="">Select Session</option>
+    </select>
+    <div id="attendanceList" class="max-h-48 overflow-y-auto mb-2"></div>
+    <input type="file" id="attendanceExcel" accept=".xlsx,.xls" class="mb-2">
+    <button onclick="saveAttendance()" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white w-full"><i class="fas fa-save"></i> <span data-lang="saveAttendance">Save Attendance</span></button>
+  </section>
+
+  <!-- Charts -->
+  <section class="bg-gray-800 rounded-xl p-6 shadow-lg lg:col-span-3 mt-6">
+    <h2 class="text-2xl font-bold mb-4 text-green-300"><i class="fas fa-chart-line"></i> <span data-lang="analytics">Analytics</span></h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="bg-gray-700 p-4 rounded">
+        <h3 class="text-xl font-semibold mb-2 text-yellow-300" data-lang="attendanceChart">Attendance per Session</h3>
+        <canvas id="attendanceChart"></canvas>
+      </div>
+      <div class="bg-gray-700 p-4 rounded">
+        <h3 class="text-xl font-semibold mb-2 text-red-300" data-lang="dropoutChart">Dropout Risk</h3>
+        <canvas id="dropoutChart"></canvas>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="toastContainer" class="fixed bottom-4 right-4 space-y-2 z-50"></div>
+
+<script>
+// Language translations
+const translations={
+  en:{header:"Uday Teacher Dashboard",createSession:"Create Session",studentRisk:"Student Dropout Risk",showRisk:"Show Risk",attendance:"Attendance",saveAttendance:"Save Attendance",analytics:"Analytics",attendanceChart:"Attendance per Session",dropoutChart:"Dropout Risk"},
+  hi:{header:"उदय शिक्षक डैशबोर्ड",createSession:"सत्र बनाएँ",studentRisk:"छात्र ड्रॉपआउट जोखिम",showRisk:"जोखिम दिखाएँ",attendance:"हाज़िरी",saveAttendance:"हाज़िरी सहेजें",analytics:"विश्लेषण",attendanceChart:"सत्र अनुसार हाज़िरी",dropoutChart:"ड्रॉपआउट जोखिम"},
+  kn:{header:"ಉದಯ ಶಿಕ್ಷಕ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್",createSession:"ಸತ್ರವನ್ನು ರಚಿಸಿ",studentRisk:"ವಿದ್ಯಾರ್ಥಿ ಡ್ರಾಪ್‌ಔಟ್ ರಿಸ್ಕ್",showRisk:"ರಿಸ್ಕ್ ತೋರಿಸಿ",attendance:"ಹಾಜರಿ",saveAttendance:"ಹಾಜರಿಸು",analytics:"ವಿಶ್ಲೇಷಣೆ",attendanceChart:"ಸತ್ರದ ಪ್ರತಿ ಹಾಜರಿ",dropoutChart:"ಡ್ರಾಪ್‌ಔಟ್ ರಿಸ್ಕ್"},
+  mr:{header:"उदय शिक्षक डॅशबोर्ड",createSession:"सत्र तयार करा",studentRisk:"विद्यार्थी ड्रॉपआउट धोका",showRisk:"धोका दाखवा",attendance:"हजेरी",saveAttendance:"हजेरी जतन करा",analytics:"विश्लेषण",attendanceChart:"सत्रानुसार हजेरी",dropoutChart:"ड्रॉपआउट धोका"}
+};
+
+document.getElementById("languageSelect").addEventListener("change",e=>{
+  const lang=e.target.value;
+  document.getElementById("headerText").innerText=translations[lang].header;
+  document.querySelectorAll("[data-lang]").forEach(el=>el.innerText=translations[lang][el.dataset.lang]);
+});
+
+// LocalStorage helpers
+function getData(key){return JSON.parse(localStorage.getItem(key))||[];}
+function setData(key,data){localStorage.setItem(key,JSON.stringify(data));}
+function showToast(msg){const container=document.getElementById("toastContainer"); const toast=document.createElement("div"); toast.className="toast bg-purple-600 text-white px-4 py-2 rounded shadow show"; toast.innerText=msg; container.appendChild(toast); setTimeout(()=>toast.remove(),3000);}
+
+// Sessions
+function renderSessions(){
+  const sessions=getData("sessions");
+  const list=document.getElementById("sessionList");
+  const select=document.getElementById("attendanceSession");
+  list.innerHTML=""; select.innerHTML=`<option value="">Select Session</option>`;
+  sessions.forEach((s,i)=>{
+    const li=document.createElement("li");
+    li.className="flex justify-between items-center bg-gray-700 px-3 py-2 rounded";
+    li.innerHTML=`<span>${s}</span><button onclick="deleteItem('sessions',${i})" class="text-red-400 hover:text-red-600"><i class="fas fa-trash"></i></button>`;
+    list.appendChild(li);
+    const opt=document.createElement("option"); opt.value=s; opt.innerText=s; select.appendChild(opt);
+  });
+}
+
+document.getElementById("sessionForm").addEventListener("submit",e=>{
+  e.preventDefault(); 
+  const name=document.getElementById("sessionName").value;
+  const sessions=getData("sessions"); sessions.push(name); setData("sessions",sessions);
+  renderSessions(); e.target.reset(); showToast("Session added!");
+});
+
+function deleteItem(key,index){const data=getData(key); data.splice(index,1); setData(key,data); renderSessions(); showToast("Deleted!");}
+
+// Student Excel
+let excelData=[];
+document.getElementById("riskExcel").addEventListener("change",e=>{
+  const file=e.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    const data=new Uint8Array(ev.target.result);
+    const wb=XLSX.read(data,{type:"array"});
+    const sheet=wb.Sheets[wb.SheetNames[0]];
+    excelData=XLSX.utils.sheet_to_json(sheet);
+    renderStudentAttendance(); renderCharts(); showToast("Excel loaded!");
+  };
+  reader.readAsArrayBuffer(file);
+});
+
+// Render student attendance
+function renderStudentAttendance(){
+  const listDiv=document.getElementById("attendanceList");
+  const select=document.getElementById("studentSelect");
+  listDiv.innerHTML=""; select.innerHTML=`<option value="">Select Student</option>`;
+  excelData.forEach((s,i)=>{
+    const div=document.createElement("div");
+    div.className="flex items-center justify-between bg-gray-700 px-3 py-2 rounded mb-1";
+    div.innerHTML=`<span>${s.Name || "Unknown"} (${s.Class || "N/A"})</span><input type="checkbox" data-index="${i}" class="form-checkbox h-5 w-5 text-blue-600">`;
+    listDiv.appendChild(div);
+    const opt=document.createElement("option"); opt.value=i; opt.innerText=`${s.Name || "Unknown"} (${s.Class || "N/A"})`; select.appendChild(opt);
+  });
+}
+
+// Attendance Excel
+document.getElementById("attendanceExcel").addEventListener("change",e=>{
+  const file=e.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    const data=new Uint8Array(ev.target.result);
+    const wb=XLSX.read(data,{type:"array"});
+    const sheet=wb.Sheets[wb.SheetNames[0]];
+    const sheetData=XLSX.utils.sheet_to_json(sheet);
+    sheetData.forEach(s=>{
+      if(!s.Name) return; 
+      const existing=excelData.find(ex=>ex.Name===s.Name); 
+      if(existing) Object.assign(existing,s); else excelData.push(s);
+    });
+    renderStudentAttendance(); showToast("Attendance Excel merged!");
+  };
+  reader.readAsArrayBuffer(file);
+});
+
+// Save attendance
+function saveAttendance(){
+  const checkboxes=document.querySelectorAll("#attendanceList input[type=checkbox]");
+  const session=document.getElementById("attendanceSession").value; if(!session){alert("Select session"); return;}
+  const attendance=getData("attendance");
+  checkboxes.forEach(cb=>{ 
+    const idx=parseInt(cb.dataset.index); 
+    if(cb.checked) attendance.push({session,student:excelData[idx].Name}); 
+  });
+  setData("attendance",attendance); showToast("Attendance saved!"); renderCharts();
+}
+
+// Calculate risk (FIXED)
+function calculateRisk(student){
+  let risk = 0;
+  let reasons = [];
+
+  const attendance = Number(student.Attendance) || 0;
+  const marks = Number(student.Marks) || 0;
+  const feesStatus = (student.FeesStatus || "").toLowerCase();
+
+  if(attendance < 75){ risk += 40; reasons.push("Low attendance"); }
+  if(marks < 50){ risk += 40; reasons.push("Poor grades"); }
+  if(feesStatus && feesStatus !== "paid"){ risk += 20; reasons.push("Unpaid fees"); }
+
+  if(risk > 100) risk = 100;
+  return { prob: risk, reasons: reasons.join(", ") };
+}
+
+// Show risk
+function showRisk(){
+  const sel=document.getElementById("studentSelect"); 
+  const idx=parseInt(sel.value); 
+  if(isNaN(idx)) return alert("Select student!");
+  const student=excelData[idx]; 
+  const {prob,reasons}=calculateRisk(student);
+  const table=document.getElementById("riskTable");
+  table.classList.remove("hidden");
+  table.innerHTML=`<tr class="bg-purple-700"><th class="p-2">Student</th><th class="p-2">Probability (%)</th><th class="p-2">Reasons</th></tr>
+    <tr class="bg-gray-700"><td class="p-2">${student.Name}</td><td class="p-2">${prob}</td><td class="p-2">${reasons}</td></tr>`;
+  renderCharts();
+}
+
+// Assign high-risk students to remedial session
+function assignRemedial(){
+  const session=document.getElementById("attendanceSession").value; if(!session){alert("Select session"); return;}
+  const attendance=getData("attendance");
+  excelData.forEach(s=>{ const {prob}=calculateRisk(s); if(prob>=50) attendance.push({session,student:s.Name}); });
+  setData("attendance",attendance); showToast("High-risk students assigned to session!"); renderCharts();
+}
+
+// Charts
+let attendanceChart=null, dropoutChart=null;
+function renderCharts(){
+  const sessions=getData("sessions");
+  const attendance=getData("attendance");
+  const sessionCounts=sessions.map(s=>attendance.filter(a=>a.session===s).length);
+  if(attendanceChart) attendanceChart.destroy();
+  const ctx1=document.getElementById("attendanceChart").getContext("2d");
+  attendanceChart=new Chart(ctx1,{type:"bar",data:{labels:sessions,datasets:[{label:"Attendance",data:sessionCounts,backgroundColor:"#7f00ff"}]},options:{responsive:true}});
+  
+  const riskCount={High:0,Low:0};
+  excelData.forEach(s=>{ const {prob}=calculateRisk(s); prob>=50 ? riskCount.High++ : riskCount.Low++; });
+  if(dropoutChart) dropoutChart.destroy();
+  const ctx2=document.getElementById("dropoutChart").getContext("2d");
+  dropoutChart=new Chart(ctx2,{type:"pie",data:{labels:Object.keys(riskCount),datasets:[{data:Object.values(riskCount),backgroundColor:["#ff1a75","#1affd5"]}]},options:{responsive:true}});
+}
+
+// Initialize
+renderSessions();
+</script>
+</body>
+</html>
