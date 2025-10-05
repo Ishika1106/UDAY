@@ -6,8 +6,7 @@ import os
 from flask_cors import CORS
 
 app = Flask(__name__)
-# Enable CORS for all routes
-CORS(app, resources={r"/*": {"origins": "*"}})
+CORS(app)  # Enable CORS for all routes
 
 # Directory to save trained models
 MODEL_DIR = "models"
@@ -30,12 +29,11 @@ def train():
         if target_col not in df.columns:
             return jsonify({"status": "error", "message": f"Target column '{target_col}' not found in data"}), 400
 
-        feature_cols = [c for c in df.columns if c != target_col]
+        # Exclude non-numeric columns and the target_col from features
+        feature_cols = [c for c in df.columns if c != target_col and pd.api.types.is_numeric_dtype(df[c])]
 
-        # Ensure features are numeric
-        for col in feature_cols:
-            if not pd.api.types.is_numeric_dtype(df[col]):
-                return jsonify({"status": "error", "message": f"Feature column '{col}' must be numeric"}), 400
+        if not feature_cols:
+            return jsonify({"status": "error", "message": "No valid numeric feature columns found for training"}), 400
 
         model = LogisticRegression(max_iter=1000)
         model.fit(df[feature_cols], df[target_col])
