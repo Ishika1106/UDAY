@@ -1,75 +1,192 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark"> 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Uday - Unified Dropout Analysis for Youth</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  
   <style>
-    /* Fade + slide animation */
+    /* 1. CSS Variables - CLEANED UP */
+    :root {
+        --primary-purple: #7c3aed; /* Indigo 600 */
+        --accent-blue: #3b82f6;   /* Blue 500 */
+        --text-dark: #1f2937;
+        --text-light: #f3f4f6;
+
+        /* Dark Theme Variables */
+        --bg-main-dark: #0f172a; /* Slate-900 */
+        --bg-card-dark: #1e293b; /* Slate-800 */
+        --shadow-dark: 0 4px 15px rgba(0, 0, 0, 0.5);
+    }
+    .light {
+        /* Light Theme Variables */
+        --bg-main-dark: #ffffff; /* Pure White */
+        --bg-card-dark: #f9fafb; /* Off-White */
+        --shadow-dark: 0 4px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      /* Using a simpler background property for cleaner transition */
+      background-color: var(--bg-main-dark);
+      transition: background-color 0.4s ease;
+      color: var(--text-color-dark);
+    }
+    .dark body { 
+      color: var(--text-light); 
+      background-image: linear-gradient(to bottom right, #000000, var(--bg-main-dark), #1f013d);
+    }
+    .light body { 
+      color: var(--text-dark); 
+      background-image: none; /* Solid color for professional light theme */
+    }
+    
+    /* Dynamic Colors based on Theme */
+    .app-primary { color: var(--primary-purple); }
+    .dark .app-accent { color: var(--accent-blue); }
+    .light .app-accent { color: #1e40af; } 
+    
+    /* 2. Keyframe Animations - Subtler fade */
     @keyframes fadeSlide {
-      0% { opacity: 0; transform: translateY(-20px); }
+      0% { opacity: 0; transform: translateY(-10px); }
       100% { opacity: 1; transform: translateY(0); }
     }
-    .fade-slide { animation: fadeSlide 1.2s ease-in-out; }
+    .fade-slide { animation: fadeSlide 1s ease-out forwards; }
 
-    /* Floating animation */
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
-    }
-    .float { animation: float 3s ease-in-out infinite; }
+    /* Bounce and Glow animations removed for professional focus */
 
-    /* Neon Glow animation */
-    @keyframes neonGlow {
-      0%, 100% { box-shadow: 0 0 15px rgba(168,85,247,0.6), 0 0 30px rgba(59,130,246,0.6); }
-      50% { box-shadow: 0 0 25px rgba(168,85,247,0.9), 0 0 45px rgba(59,130,246,0.9); }
+    /* 3. Staggered appearance */
+    .fade-delay:nth-child(1) { animation-delay: 0.2s; }
+    .fade-delay:nth-child(2) { animation-delay: 0.3s; }
+    .fade-delay:nth-child(3) { animation-delay: 0.4s; }
+    .fade-delay:nth-child(4) { animation-delay: 0.5s; }
+
+    /* 4. Card/Block Styling - PROFESSIONAL */
+    .card {
+        background-color: var(--bg-card-dark);
+        border: 1px solid transparent; 
+        border-radius: 0.75rem;
+        padding: 2rem 1.5rem; /* Better padding for mobile */
+        text-align: center;
+        font-weight: 600; 
+        font-size: 1.125rem; 
+        transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s, border-color 0.3s;
+        box-shadow: var(--shadow-dark);
     }
-    .glow { animation: neonGlow 2.5s ease-in-out infinite; }
+    
+    .card-hover:hover {
+        transform: translateY(-4px) scale(1.01); /* Subtle lift on hover */
+        border-color: var(--primary-purple);
+        box-shadow: 0 8px 18px rgba(124, 58, 237, 0.25);
+    }
+    .light .card {
+        border-color: #e5e7eb;
+    }
+    .light .card-hover:hover {
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.1);
+    }
+
+    /* 5. Modal Styling */
+    .modal-backdrop {
+        background-color: rgba(0, 0, 0, 0.8);
+    }
+    .modal-content {
+        background-color: var(--bg-card-dark);
+        color: var(--text-light);
+    }
+    .light .modal-content {
+        background-color: #ffffff;
+        color: var(--text-dark);
+        border: 1px solid #d1d5db;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
   </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center font-sans 
-             bg-gradient-to-br from-black via-gray-900 to-purple-950 text-white">
 
-  <!-- Heading -->
-  <header class="mb-8 text-center fade-slide">
-    <h1 class="text-5xl font-extrabold text-purple-400 drop-shadow-lg">Uday</h1>
-    <p id="subtitle" class="text-blue-300 mt-3 text-lg">Unified Dropout Analysis for Youth</p>
+<body class="min-h-screen flex flex-col items-center justify-center p-4 sm:p-6">
+
+  <header class="mb-6 text-center fade-slide w-full max-w-lg pt-8">
+    <h1 class="text-6xl md:text-7xl font-extrabold tracking-tight app-primary">Uday</h1>
+    <p id="subtitle" class="app-accent mt-2 text-xl md:text-2xl font-normal text-gray-500 light:text-gray-600">Unified Dropout Analysis for Youth</p>
   </header>
 
-  <!-- Language Selection -->
-  <div class="mb-10 fade-slide">
-    <label for="language" class="mr-2 text-purple-300 font-medium">🌐 Language:</label>
+  <button onclick="document.getElementById('infoModal').classList.remove('hidden')" 
+          class="mb-8 px-6 py-2.5 text-sm font-medium rounded-full text-white bg-primary-purple hover:opacity-90 shadow-lg transition fade-slide"
+          style="animation-delay: 0.1s;">
+    <i class="fas fa-lightbulb mr-2"></i> Learn More About Our AI
+  </button>
+
+  <div class="w-full max-w-sm h-px bg-gray-300 dark:bg-gray-700 mb-10 fade-slide" style="animation-delay: 0.2s;"></div>
+
+  <div class="mb-10 w-full max-w-md text-center fade-slide" style="animation-delay: 0.3s;">
+    <label for="language" class="mr-4 text-lg font-medium text-gray-600 dark:text-gray-400">🌐 Language:</label>
     <select id="language" onchange="changeLanguage()" 
-            class="p-2 rounded-lg border border-purple-500 bg-gray-800 text-purple-200 shadow-md hover:shadow-lg transition">
+            class="p-3 rounded-lg shadow-sm focus:ring-2 focus:ring-primary-purple focus:outline-none 
+                   bg-gray-100 dark:bg-slate-800 border border-gray-300 dark:border-gray-700 text-gray-800 dark:text-white transition"
+            aria-label="Select Application Language">
       <option value="en">English</option>
       <option value="hi">हिन्दी</option>
       <option value="kn">ಕನ್ನಡ</option>
-      <option value="mr">मारवाड़ी</option>
+      <option value="mr">मराठी</option>
     </select>
   </div>
 
-  <!-- Role Selection Blocks -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 w-4/5 max-w-3xl fade-slide">
+  <main class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-3xl px-4">
+    
     <a href="admin.html" id="adminBlock"
-       class="block float glow bg-gray-900/70 hover:bg-gray-800 rounded-2xl p-10 text-center font-bold text-xl text-purple-300 transition transform hover:scale-110 hover:-rotate-1">
+       class="card card-hover fade-delay app-primary" style="animation-delay: 0.4s;">
+       <i class="fas fa-user-shield text-3xl mb-2"></i>
       Admin
     </a>
     <a href="teacher.html" id="teacherBlock"
-       class="block float glow bg-gray-900/70 hover:bg-gray-800 rounded-2xl p-10 text-center font-bold text-xl text-blue-300 transition transform hover:scale-110 hover:rotate-1">
+       class="card card-hover fade-delay app-accent" style="animation-delay: 0.5s;">
+       <i class="fas fa-chalkboard-teacher text-3xl mb-2"></i>
       Teacher
     </a>
     <a href="student.html" id="studentBlock"
-       class="block float glow bg-gray-900/70 hover:bg-gray-800 rounded-2xl p-10 text-center font-bold text-xl text-purple-300 transition transform hover:scale-110 hover:-rotate-2">
+       class="card card-hover fade-delay app-primary" style="animation-delay: 0.6s;">
+       <i class="fas fa-user-graduate text-3xl mb-2"></i>
       Student
     </a>
     <a href="parent.html" id="parentBlock"
-       class="block float glow bg-gray-900/70 hover:bg-gray-800 rounded-2xl p-10 text-center font-bold text-xl text-blue-300 transition transform hover:scale-110 hover:rotate-2">
+       class="card card-hover fade-delay app-accent" style="animation-delay: 0.7s;">
+       <i class="fas fa-users text-3xl mb-2"></i>
       Parent
     </a>
+  </main>
+
+  <footer class="mt-12 text-gray-500 text-sm fade-slide w-full max-w-3xl text-center p-4">
+    <p class="mb-2">© 2025 Uday — Empowering Education Through AI Insights</p>
+    <div class="flex justify-center items-center space-x-4">
+      <a href="mailto:support@uday.org" class="app-accent hover:underline transition">Contact Support</a>
+      <span>|</span>
+      <button id="themeToggle" onclick="toggleTheme()" class="text-gray-600 dark:text-gray-400 hover:text-primary-purple transition">
+        <i class="fas fa-sun text-lg mr-1"></i> <span id="themeText">Switch to Dark Theme</span>
+      </button>
+    </div>
+  </footer>
+
+  <div id="infoModal" class="fixed inset-0 hidden z-[99] flex items-center justify-center p-4">
+    <div class="modal-backdrop absolute inset-0" onclick="document.getElementById('infoModal').classList.add('hidden')"></div>
+    <div class="modal-content relative max-w-lg w-full p-8 rounded-xl shadow-2xl transform transition-all duration-300 scale-100">
+        <h2 class="text-3xl font-bold mb-4 app-primary">Predictive Analytics Platform</h2>
+        <p class="text-lg leading-relaxed text-gray-700 dark:text-gray-300">
+            **Uday** is an **AI-driven intelligence layer** for educational institutions. It uses predictive analytics on performance, attendance, and behavioral data to identify students at risk of dropping out.
+        </p>
+        <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">
+            Our goal is to shift from reactive intervention to **proactive student support**.
+        </p>
+        <button onclick="document.getElementById('infoModal').classList.add('hidden')" 
+                class="mt-6 px-4 py-2 bg-primary-purple text-white rounded-lg hover:opacity-90 transition focus:outline-none focus:ring-2 focus:ring-primary-purple">
+            Acknowledge
+        </button>
+    </div>
   </div>
 
-  <!-- Dynamic Language Script -->
+
   <script>
     const translations = {
       en: {
@@ -104,12 +221,70 @@
 
     function changeLanguage() {
       const lang = document.getElementById("language").value;
-      document.getElementById("subtitle").innerText = translations[lang].subtitle;
-      document.getElementById("adminBlock").innerText = translations[lang].admin;
-      document.getElementById("teacherBlock").innerText = translations[lang].teacher;
-      document.getElementById("studentBlock").innerText = translations[lang].student;
-      document.getElementById("parentBlock").innerText = translations[lang].parent;
+      const t = translations[lang];
+      document.getElementById("subtitle").innerText = t.subtitle;
+      // Update role block text and icons
+      document.getElementById("adminBlock").innerHTML = '<i class="fas fa-user-shield text-3xl mb-2"></i>' + t.admin;
+      document.getElementById("teacherBlock").innerHTML = '<i class="fas fa-chalkboard-teacher text-3xl mb-2"></i>' + t.teacher;
+      document.getElementById("studentBlock").innerHTML = '<i class="fas fa-user-graduate text-3xl mb-2"></i>' + t.student;
+      document.getElementById("parentBlock").innerHTML = '<i class="fas fa-users text-3xl mb-2"></i>' + t.parent;
     }
+    
+    // Theme Toggle Functionality
+    const htmlElement = document.documentElement;
+    const themeText = document.getElementById('themeText');
+
+    function updateThemeUI(isDark) {
+        if (isDark) {
+            themeText.innerText = 'Switch to Light Theme';
+            document.getElementById('themeToggle').querySelector('i').className = 'fas fa-moon text-lg mr-1';
+        } else {
+            themeText.innerText = 'Switch to Dark Theme';
+            document.getElementById('themeToggle').querySelector('i').className = 'fas fa-sun text-lg mr-1';
+        }
+    }
+
+    function toggleTheme() {
+        const isDark = htmlElement.classList.contains('dark');
+        if (isDark) {
+            htmlElement.classList.remove('dark');
+            htmlElement.classList.add('light');
+            localStorage.setItem('theme', 'light');
+            updateThemeUI(false);
+        } else {
+            htmlElement.classList.remove('light');
+            htmlElement.classList.add('dark');
+            localStorage.setItem('theme', 'dark');
+            updateThemeUI(true);
+        }
+    }
+
+    // Initialize Language and Theme on Load
+    document.addEventListener('DOMContentLoaded', () => {
+        // Initial Theme Check
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        let initialThemeIsDark = true;
+        
+        if (savedTheme) {
+            initialThemeIsDark = (savedTheme === 'dark');
+        } else if (!prefersDark) {
+            // Default to light if no preference and system is not dark
+            initialThemeIsDark = false;
+        }
+
+        if (initialThemeIsDark) {
+            htmlElement.classList.add('dark');
+            htmlElement.classList.remove('light');
+        } else {
+            htmlElement.classList.add('light');
+            htmlElement.classList.remove('dark');
+        }
+        
+        updateThemeUI(initialThemeIsDark);
+        changeLanguage(); // Apply initial language and update dynamic icons/text
+    });
   </script>
 
 </body>
