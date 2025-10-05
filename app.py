@@ -29,7 +29,12 @@ def train():
         if target_col not in df.columns:
             return jsonify({"status": "error", "message": f"Target column '{target_col}' not found in data"}), 400
 
-        # Exclude non-numeric columns and the target_col from features
+        # Convert all non-target columns to numeric if possible
+        for col in df.columns:
+            if col != target_col:
+                df[col] = pd.to_numeric(df[col], errors='coerce')
+
+        # Only use numeric columns as features (excluding target_col)
         feature_cols = [c for c in df.columns if c != target_col and pd.api.types.is_numeric_dtype(df[c])]
 
         if not feature_cols:
@@ -63,12 +68,14 @@ def predict():
         feature_cols = saved["columns"]
 
         df = pd.DataFrame(data['student_data'])
+
         missing_cols = [col for col in feature_cols if col not in df.columns]
         if missing_cols:
             return jsonify({"status": "error", "message": f"Missing feature columns in student_data: {missing_cols}"}), 400
 
-        # Ensure features are numeric
+        # Convert all feature columns to numeric for prediction
         for col in feature_cols:
+            df[col] = pd.to_numeric(df[col], errors='coerce')
             if not pd.api.types.is_numeric_dtype(df[col]):
                 return jsonify({"status": "error", "message": f"Feature column '{col}' must be numeric"}), 400
 
