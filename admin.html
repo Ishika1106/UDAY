@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,288 +9,341 @@
     <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* Modern Dark Theme Variables */
         :root {
-            --color-primary: #7c3aed; /* Violet/Purple */
-            --color-secondary: #10b981; /* Emerald/Green */
-            --bg-dark: #0f172a; /* Slate 900 */
-            --bg-card: #1e293b; /* Slate 800 */
-            --text-light: #e2e8f0; /* Slate 200 */
+            --color-primary: #7c3aed;
+            --color-secondary: #10b981;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --text-light: #e2e8f0;
         }
-
-        body {
-            background-color: var(--bg-dark);
-            color: var(--text-light);
-            font-family: 'Inter', sans-serif;
-        }
-        
-        /* Sidebar Styling */
+        body { background-color: var(--bg-dark); color: var(--text-light); font-family: 'Inter', sans-serif; }
         .sidebar {
             width: 250px;
             background-color: var(--bg-card);
             box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
             transition: transform 0.3s ease;
         }
-
-        /* Input/Button Styling */
         input:focus, select:focus, button:focus, .card:focus {
             outline: none;
-            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.5); /* Primary color focus ring */
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.5);
         }
-
-        .list-item-animation {
-            transition: all 0.3s ease;
-        }
-        
-        /* Toast Styling - Professional Look */
-        #toastContainer {
-            z-index: 100;
-        }
+        .list-item-animation { transition: all 0.3s ease; }
+        #toastContainer { z-index: 100; }
         .toast {
-            /* Updated to use generic colors for success/error in JS */
-            color: white;
-            padding: 10px 15px;
-            border-radius: 6px;
+            color: white; padding: 10px 15px; border-radius: 6px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Spring-like animation */
+            opacity: 0; transform: translateY(20px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-
-        .toast.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Custom Scrollbar Style (CSS not Tailwind) */
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background-color: var(--color-primary);
-            border-radius: 3px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: var(--bg-card);
-        }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: var(--color-primary); border-radius: 3px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: var(--bg-card); }
     </style>
 </head>
-
 <body class="min-h-screen flex">
 
-    <aside id="sidebar" class="sidebar fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 z-20 flex-shrink-0 p-4 border-r border-gray-700">
-        <h2 class="text-2xl font-extrabold mb-8 mt-2 text-white">
-            <i class="fas fa-microchip mr-2 text-purple-400"></i> Uday AI
-        </h2>
-        <nav class="space-y-2">
-            <a href="#" class="flex items-center p-3 rounded-lg bg-purple-600 text-white font-semibold">
-                <i class="fas fa-tachometer-alt mr-3"></i> Dashboard
-            </a>
-            <a href="users.html" class="flex items-center p-3 rounded-lg hover:bg-gray-700 text-gray-300 transition">
-                <i class="fas fa-users-cog mr-3"></i> User Settings
-            </a>
-            <a href="reports.html" class="flex items-center p-3 rounded-lg hover:bg-gray-700 text-gray-300 transition">
-                <i class="fas fa-file-contract mr-3"></i> Detailed Reports
-            </a>
-        </nav>
-        
-        <div class="absolute bottom-4 left-4 right-4">
-             <select id="languageSelect" class="w-full p-2 rounded bg-gray-700 text-white border border-gray-600 mb-4">
-                <option value="eng">English</option>
-                <option value="hin">Hindi</option>
-                <option value="kan">Kannada</option>
-                <option value="mar">Marwari</option>
-            </select>
-             <button onclick="clearAllData()" class="w-full bg-red-700 hover:bg-red-800 text-white py-2 rounded-lg text-sm transition">
-                <i class="fas fa-eraser mr-2"></i> Clear Local Data for Current School
+<aside id="sidebar"
+    class="sidebar fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 z-20 flex-shrink-0 p-4 border-r border-gray-700">
+    <h2 class="text-2xl font-extrabold mb-8 mt-2 text-white">
+        <i class="fas fa-microchip mr-2 text-purple-400"></i> Uday AI
+    </h2>
+    <nav class="space-y-2">
+        <a href="#" class="flex items-center p-3 rounded-lg bg-purple-600 text-white font-semibold">
+            <i class="fas fa-tachometer-alt mr-3"></i> Dashboard
+        </a>
+        <a href="users.html" class="flex items-center p-3 rounded-lg hover:bg-gray-700 text-gray-300 transition">
+            <i class="fas fa-users-cog mr-3"></i> User Settings
+        </a>
+        <a href="reports.html" class="flex items-center p-3 rounded-lg hover:bg-gray-700 text-gray-300 transition">
+            <i class="fas fa-file-contract mr-3"></i> Detailed Reports
+        </a>
+    </nav>
+    <div class="absolute bottom-4 left-4 right-4">
+        <select id="languageSelect" class="w-full p-2 rounded bg-gray-700 text-white border border-gray-600 mb-4">
+            <option value="eng">English</option>
+            <option value="hin">Hindi</option>
+            <option value="kan">Kannada</option>
+            <option value="mar">Marwari</option>
+        </select>
+        <button onclick="clearAllData()"
+            class="w-full bg-red-700 hover:bg-red-800 text-white py-2 rounded-lg text-sm transition">
+            <i class="fas fa-eraser mr-2"></i> Clear Local Data for Current School
+        </button>
+    </div>
+</aside>
+<div class="flex-1 overflow-y-auto">
+    <header
+        class="sticky top-0 bg-slate-900/90 backdrop-blur-sm p-4 border-b border-gray-700 shadow-lg flex items-center justify-between z-10">
+        <button id="menuToggle" class="text-white text-2xl md:hidden mr-4">
+            <i class="fas fa-bars"></i>
+        </button>
+        <h1 class="text-2xl font-bold text-white flex items-center gap-2">
+            <span class="text-purple-400">Admin Panel</span>
+        </h1>
+        <span class="text-sm italic text-gray-400 hidden sm:block">Unified Dropout Analysis for Youth</span>
+        <div class="flex items-center space-x-4">
+            <span class="text-gray-400 text-sm hidden sm:block">Welcome, Admin!</span>
+            <button class="text-white hover:text-red-400 transition">
+                <i class="fas fa-sign-out-alt text-xl"></i>
             </button>
         </div>
-    </aside>
-
-    <div class="flex-1 overflow-y-auto">
-        
-        <header class="sticky top-0 bg-slate-900/90 backdrop-blur-sm p-4 border-b border-gray-700 shadow-lg flex items-center justify-between z-10">
-             <button id="menuToggle" class="text-white text-2xl md:hidden mr-4">
-                <i class="fas fa-bars"></i>
-            </button>
-            <h1 class="text-2xl font-bold text-white flex items-center gap-2">
-                <span class="text-purple-400">Admin Panel</span>
-            </h1>
-            <span class="text-sm italic text-gray-400 hidden sm:block">Unified Dropout Analysis for Youth</span>
-            <div class="flex items-center space-x-4">
-                <span class="text-gray-400 text-sm hidden sm:block">Welcome, Admin!</span>
-                <button class="text-white hover:text-red-400 transition">
-                    <i class="fas fa-sign-out-alt text-xl"></i>
-                </button>
+    </header>
+    <main class="p-4 sm:p-8">
+        <!-- Summary cards -->
+        <section class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+            <div class="bg-gray-700/50 p-4 rounded-xl text-center card shadow-md hover:bg-gray-700 transition">
+                <h3 class="text-md font-medium text-gray-300" id="summaryTeachers">Total Teachers</h3>
+                <p id="totalTeachers" class="text-3xl font-bold text-purple-400 mt-1">0</p>
             </div>
-        </header>
-
-        <main class="p-4 sm:p-8">
-            
-            <section class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-                <div class="bg-gray-700/50 p-4 rounded-xl text-center card shadow-md hover:bg-gray-700 transition">
-                    <h3 class="text-md font-medium text-gray-300" id="summaryTeachers">Total Teachers</h3>
-                    <p id="totalTeachers" class="text-3xl font-bold text-purple-400 mt-1">0</p>
-                </div>
-                <div class="bg-gray-700/50 p-4 rounded-xl text-center card shadow-md hover:bg-gray-700 transition">
-                    <h3 class="text-md font-medium text-gray-300" id="summaryStudents">Total Students</h3>
-                    <p id="totalStudents" class="text-3xl font-bold text-blue-400 mt-1">0</p>
-                </div>
-                <div class="bg-gray-700/50 p-4 rounded-xl text-center card shadow-md hover:bg-gray-700 transition">
-                    <h3 class="text-md font-medium text-gray-300" id="summaryAttendance">Avg. Attendance</h3>
-                    <p id="avgAttendance" class="text-3xl font-bold text-yellow-400 mt-1">0%</p>
-                </div>
-                <div class="bg-gray-700/50 p-4 rounded-xl text-center card shadow-md hover:bg-gray-700 transition">
-                    <h3 class="text-md font-medium text-gray-300" id="summaryFees">Avg. Fees Paid</h3>
-                    <p id="avgFees" class="text-3xl font-bold text-pink-400 mt-1">₹ 0</p>
-                </div>
-                <div class="bg-gray-700/50 p-4 rounded-xl text-center card shadow-md hover:bg-gray-700 transition">
-                    <h3 class="text-md font-medium text-gray-300" id="summaryMarks">Avg. Marks</h3>
-                    <p id="avgMarks" class="text-3xl font-bold text-green-400 mt-1">0</p>
-                </div>
+            <div class="bg-gray-700/50 p-4 rounded-xl text-center card shadow-md hover:bg-gray-700 transition">
+                <h3 class="text-md font-medium text-gray-300" id="summaryStudents">Total Students</h3>
+                <p id="totalStudents" class="text-3xl font-bold text-blue-400 mt-1">0</p>
+            </div>
+            <div class="bg-gray-700/50 p-4 rounded-xl text-center card shadow-md hover:bg-gray-700 transition">
+                <h3 class="text-md font-medium text-gray-300" id="summaryAttendance">Avg. Attendance</h3>
+                <p id="avgAttendance" class="text-3xl font-bold text-yellow-400 mt-1">0%</p>
+            </div>
+            <div class="bg-gray-700/50 p-4 rounded-xl text-center card shadow-md hover:bg-gray-700 transition">
+                <h3 class="text-md font-medium text-gray-300" id="summaryFees">Avg. Fees Paid</h3>
+                <p id="avgFees" class="text-3xl font-bold text-pink-400 mt-1">₹ 0</p>
+            </div>
+            <div class="bg-gray-700/50 p-4 rounded-xl text-center card shadow-md hover:bg-gray-700 transition">
+                <h3 class="text-md font-medium text-gray-300" id="summaryMarks">Avg. Marks</h3>
+                <p id="avgMarks" class="text-3xl font-bold text-green-400 mt-1">0</p>
+            </div>
+        </section>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+            <!-- Teacher section -->
+            <section class="bg-card rounded-xl p-6 shadow-xl border border-gray-700/50">
+                <h2 id="teacherHeader" class="text-2xl font-bold mb-4 text-purple-400">
+                    <i class="fas fa-chalkboard-teacher"></i> Teachers
+                </h2>
+                <form id="teacherForm" class="space-y-3 mb-4">
+                    <input type="text" id="teacherName" placeholder="Enter Teacher Name"
+                        class="w-full p-3 rounded-lg bg-gray-700 text-gray-200 border border-gray-600 focus:border-purple-500"
+                        required>
+                    <select id="teacherClassSelect"
+                        class="w-full p-3 rounded-lg bg-gray-700 text-gray-200 border border-gray-600 focus:border-purple-500">
+                        <option value="">-- Select Class --</option>
+                    </select>
+                    <button type="submit"
+                        class="w-full bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg text-white transition">
+                        <i class="fas fa-plus"></i> <span id="teacherAddBtnText">Add</span>
+                    </button>
+                </form>
+                <ul id="teacherList" class="space-y-3 max-h-48 overflow-y-auto pr-2 custom-scrollbar"></ul>
+                <button id="teacherNotifyBtn" onclick="sendNotification('Teacher')"
+                    class="mt-4 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-white w-full transition">
+                    <i class="fas fa-bell"></i> Send Notification to Teachers
+                </button>
             </section>
-            
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-                
-                <section class="bg-card rounded-xl p-6 shadow-xl border border-gray-700/50">
-                    <h2 id="teacherHeader" class="text-2xl font-bold mb-4 text-purple-400">
-                        <i class="fas fa-chalkboard-teacher"></i> Teachers
-                    </h2>
-                    <form id="teacherForm" class="space-y-3 mb-4">
-                        <input type="text" id="teacherName" placeholder="Enter Teacher Name"
-                            class="w-full p-3 rounded-lg bg-gray-700 text-gray-200 border border-gray-600 focus:border-purple-500" required>
-                        <select id="teacherClassSelect" 
-                            class="w-full p-3 rounded-lg bg-gray-700 text-gray-200 border border-gray-600 focus:border-purple-500">
-                            <option value="">-- Select Class --</option>
-                        </select>
-                        <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg text-white transition">
-                            <i class="fas fa-plus"></i> <span id="teacherAddBtnText">Add</span>
-                        </button>
-                    </form>
-                    <ul id="teacherList" class="space-y-3 max-h-48 overflow-y-auto pr-2 custom-scrollbar"></ul>
-                    <button id="teacherNotifyBtn" onclick="sendNotification('Teacher')"
-                        class="mt-4 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-white w-full transition">
-                        <i class="fas fa-bell"></i> Send Notification to Teachers
+            <!-- Student section -->
+            <section class="bg-card rounded-xl p-6 shadow-xl border border-gray-700/50">
+                <h2 id="studentHeader" class="text-2xl font-bold mb-4 text-blue-400">
+                    <i class="fas fa-user-graduate"></i> Students
+                </h2>
+                <form id="studentForm" class="space-y-3 mb-4">
+                    <input type="text" id="studentName" placeholder="Enter Student Name"
+                        class="w-full p-3 rounded-lg bg-gray-700 text-gray-200 border border-gray-600 focus:border-blue-500"
+                        required>
+                    <select id="studentClassSelect"
+                        class="w-full p-3 rounded-lg bg-gray-700 text-gray-200 border border-gray-600 focus:border-blue-500">
+                        <option value="">-- Select Class --</option>
+                    </select>
+                    <button type="submit"
+                        class="w-full bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-white transition">
+                        <i class="fas fa-plus"></i> <span id="studentAddBtnText">Add</span>
                     </button>
-                </section>
-
-                <section class="bg-card rounded-xl p-6 shadow-xl border border-gray-700/50">
-                    <h2 id="studentHeader" class="text-2xl font-bold mb-4 text-blue-400">
-                        <i class="fas fa-user-graduate"></i> Students
-                    </h2>
-                    <form id="studentForm" class="space-y-3 mb-4">
-                        <input type="text" id="studentName" placeholder="Enter Student Name"
-                            class="w-full p-3 rounded-lg bg-gray-700 text-gray-200 border border-gray-600 focus:border-blue-500" required>
-                        <select id="studentClassSelect" 
-                            class="w-full p-3 rounded-lg bg-gray-700 text-gray-200 border border-gray-600 focus:border-blue-500">
-                            <option value="">-- Select Class --</option>
-                        </select>
-                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-white transition">
-                            <i class="fas fa-plus"></i> <span id="studentAddBtnText">Add</span>
-                        </button>
-                    </form>
-                    <ul id="studentList" class="space-y-3 max-h-48 overflow-y-auto pr-2 custom-scrollbar"></ul>
-                    <button id="studentNotifyBtn" onclick="sendNotification('Student')"
-                        class="mt-4 bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg text-white w-full transition">
-                        <i class="fas fa-bell"></i> Send Notification to Students
-                    </button>
-                </section>
-
-                <section class="bg-card rounded-xl p-6 shadow-xl border border-gray-700/50">
-                    <h2 id="collegeHeader" class="text-2xl font-bold mb-4 text-green-400">
-                        <i class="fas fa-database"></i> Data Management
-                    </h2>
-                    
-                    <div class="mb-4">
-                        <label for="schoolIdInput" class="text-sm font-medium text-gray-400">School/College ID:</label>
-                        <input type="text" id="schoolIdInput" value="SCHOOL_A"
-                            class="w-full p-3 rounded-lg bg-gray-700 text-gray-200 border border-gray-600 focus:border-purple-500" required>
-                        <p class="text-xs text-red-400 mt-1">Changing this ID loads data for a different school.</p>
-                    </div>
-
+                </form>
+                <ul id="studentList" class="space-y-3 max-h-48 overflow-y-auto pr-2 custom-scrollbar"></ul>
+                <button id="studentNotifyBtn" onclick="sendNotification('Student')"
+                    class="mt-4 bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg text-white w-full transition">
+                    <i class="fas fa-bell"></i> Send Notification to Students
+                </button>
+            </section>
+            <!-- Data Management section -->
+            <section class="bg-card rounded-xl p-6 shadow-xl border border-gray-700/50">
+                <h2 id="collegeHeader" class="text-2xl font-bold mb-4 text-green-400">
+                    <i class="fas fa-database"></i> Data Management
+                </h2>
+                <div class="mb-4">
+                    <label for="schoolIdInput" class="text-sm font-medium text-gray-400">School/College ID:</label>
+                    <input type="text" id="schoolIdInput" value="SCHOOL_A"
+                        class="w-full p-3 rounded-lg bg-gray-700 text-gray-200 border border-gray-600 focus:border-purple-500" required>
+                    <p class="text-xs text-red-400 mt-1">Changing this ID loads data for a different school.</p>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-400 mb-2">Reference Data Input Method:</label>
+                    <select id="dataInputMethod" class="w-full p-2 mb-2 rounded bg-gray-700 text-white border border-gray-600">
+                        <option value="single">Single Excel File (features + DropoutRisk column)</option>
+                        <option value="multiple">Multiple Excel Files (each file = one column)</option>
+                    </select>
+                </div>
+                <!-- Single Excel File Upload -->
+                <div id="singleExcelDiv">
                     <div class="border-2 border-dashed border-gray-600 p-4 text-center rounded-lg hover:border-green-500 transition cursor-pointer mb-6">
                         <i class="fas fa-file-excel text-green-500 text-3xl mb-2"></i>
                         <p id="excelUploadText" class="mb-2 text-sm text-gray-300">Upload Excel File (Name, Class, Attendance, Fees, Marks, DropoutRisk)</p>
                         <input type="file" id="excelFile" accept=".xlsx,.xls" class="text-gray-400 w-full text-sm">
                     </div>
-                    
-                    <button onclick="trainNewModel()" id="trainModelBtn"
-                        class="mt-4 bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg text-white w-full transition">
-                        <i class="fas fa-brain mr-2"></i> Train/Retrain Dropout Model
-                    </button>
-
-                    <h3 id="classesHeader" class="text-xl font-semibold mt-4 mb-3 text-indigo-400">
-                        <i class="fas fa-school"></i> Classes
-                    </h3>
-                    <ul id="classList" class="space-y-2 max-h-24 overflow-y-auto pr-2 custom-scrollbar mb-4"></ul>
-                    <form id="classForm" class="flex gap-2">
-                        <input type="text" id="className" placeholder="Add Class"
-                            class="flex-1 p-3 rounded-lg bg-gray-700 text-gray-200 border border-gray-600 focus:border-indigo-500" required>
-                        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-lg text-white transition">
-                            <i class="fas fa-plus"></i>
-                        </button>
-                    </form>
-
-                </section>
-            </div>
-
-            <div class="bg-card rounded-xl p-6 shadow-xl border border-gray-700/50 mt-6">
-                <div class="flex border-b border-gray-700 mb-4">
-                    <button id="tabExcel" class="px-4 py-2 text-sm font-medium border-b-2 border-purple-500 text-purple-400 transition">
-                        Excel Data Preview
-                    </button>
-                    <button id="tabAssignments" class="px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-400 hover:text-white transition">
-                        Class Assignments
-                    </button>
                 </div>
-
-                <div id="excelOutput" class="max-h-72 overflow-y-auto custom-scrollbar tab-content"></div>
-
-                <div id="assignmentOutput" class="max-h-72 overflow-y-auto custom-scrollbar tab-content hidden">
-                    <p class="text-gray-400 mb-4" id="assignmentTitle">Teachers managing which classes:</p>
-                    <ul id="assignmentList" class="space-y-3">
-                        </ul>
+                <!-- Multiple Excel Files Upload -->
+                <div id="multipleExcelDiv" class="hidden">
+                    <div class="border-2 border-dashed border-gray-600 p-4 text-center rounded-lg hover:border-green-500 transition cursor-pointer mb-6">
+                        <i class="fas fa-file-excel text-green-500 text-3xl mb-2"></i>
+                        <p class="mb-2 text-sm text-gray-300">Upload Multiple Excel Files (each file = one column, header as feature name)</p>
+                        <input type="file" id="multipleExcelFiles" accept=".xlsx,.xls" multiple class="text-gray-400 w-full text-sm">
+                    </div>
+                    <button type="button" onclick="handleMultipleExcel()" class="w-full bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg text-white mb-2">Import Multiple Excel Columns</button>
                 </div>
-            </div>
-            
-            <section class="bg-card rounded-xl p-6 shadow-xl border border-gray-700/50 mt-6">
-                <h2 class="text-2xl font-bold mb-6 text-yellow-400" id="analyticsDashboard">
-                    <i class="fas fa-chart-line"></i> Analytics Dashboard
-                </h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-gray-700/50 p-4 rounded-lg shadow-inner">
-                        <h3 class="text-xl font-semibold mb-2 text-yellow-300" id="chartAttendance">Attendance</h3>
-                        <canvas id="attendanceChart"></canvas>
-                    </div>
-                    <div class="bg-gray-700/50 p-4 rounded-lg shadow-inner">
-                        <h3 class="text-xl font-semibold mb-2 text-pink-300" id="chartFees">Fees</h3>
-                        <canvas id="feesChart"></canvas>
-                    </div>
-                    <div class="bg-gray-700/50 p-4 rounded-lg shadow-inner">
-                        <h3 class="text-xl font-semibold mb-2 text-blue-300" id="chartMarks">Marks</h3>
-                        <canvas id="marksChart"></canvas>
-                    </div>
-                </div>
+                <button onclick="trainNewModel()" id="trainModelBtn"
+                    class="mt-4 bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg text-white w-full transition">
+                    <i class="fas fa-brain mr-2"></i> Train/Retrain Dropout Model
+                </button>
+                <h3 id="classesHeader" class="text-xl font-semibold mt-4 mb-3 text-indigo-400">
+                    <i class="fas fa-school"></i> Classes
+                </h3>
+                <ul id="classList" class="space-y-2 max-h-24 overflow-y-auto pr-2 custom-scrollbar mb-4"></ul>
+                <form id="classForm" class="flex gap-2">
+                    <input type="text" id="className" placeholder="Add Class"
+                        class="flex-1 p-3 rounded-lg bg-gray-700 text-gray-200 border border-gray-600 focus:border-indigo-500" required>
+                    <button type="submit"
+                        class="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-lg text-white transition">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </form>
             </section>
-        </main>
-    </div>
-    
-    <div id="toastContainer" class="fixed bottom-4 right-4 space-y-2 z-50"></div>
-    
-    <script>
-        // !!! IMPORTANT: REPLACE THIS WITH YOUR ACTUAL CLOUD RUN TRAINING URL !!!
-        // This is the URL of your deployed Python API's /train endpoint.
-        const TRAINING_ENDPOINT = 'https://YOUR_CLOUD_RUN_URL_HERE/train'; 
+        </div>
+        <!-- Excel preview, assignments, analytics, etc. -->
+        <div class="bg-card rounded-xl p-6 shadow-xl border border-gray-700/50 mt-6">
+            <div class="flex border-b border-gray-700 mb-4">
+                <button id="tabExcel"
+                    class="px-4 py-2 text-sm font-medium border-b-2 border-purple-500 text-purple-400 transition">
+                    Excel Data Preview
+                </button>
+                <button id="tabAssignments"
+                    class="px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-400 hover:text-white transition">
+                    Class Assignments
+                </button>
+            </div>
+            <div id="excelOutput" class="max-h-72 overflow-y-auto custom-scrollbar tab-content"></div>
+            <div id="assignmentOutput" class="max-h-72 overflow-y-auto custom-scrollbar tab-content hidden">
+                <p class="text-gray-400 mb-4" id="assignmentTitle">Teachers managing which classes:</p>
+                <ul id="assignmentList" class="space-y-3"></ul>
+            </div>
+        </div>
+        <!-- Analytics ... -->
+        <section class="bg-card rounded-xl p-6 shadow-xl border border-gray-700/50 mt-6">
+            <h2 class="text-2xl font-bold mb-6 text-yellow-400" id="analyticsDashboard">
+                <i class="fas fa-chart-line"></i> Analytics Dashboard
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-gray-700/50 p-4 rounded-lg shadow-inner">
+                    <h3 class="text-xl font-semibold mb-2 text-yellow-300" id="chartAttendance">Attendance</h3>
+                    <canvas id="attendanceChart"></canvas>
+                </div>
+                <div class="bg-gray-700/50 p-4 rounded-lg shadow-inner">
+                    <h3 class="text-xl font-semibold mb-2 text-pink-300" id="chartFees">Fees</h3>
+                    <canvas id="feesChart"></canvas>
+                </div>
+                <div class="bg-gray-700/50 p-4 rounded-lg shadow-inner">
+                    <h3 class="text-xl font-semibold mb-2 text-blue-300" id="chartMarks">Marks</h3>
+                    <canvas id="marksChart"></canvas>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+<div id="toastContainer" class="fixed bottom-4 right-4 space-y-2 z-50"></div>
+<script>
+const TRAINING_ENDPOINT = 'https://uday-bmub.onrender.com/train';
 
-        // --- Language Data (Unchanged) ---
-        const langData = {
+// ----------------- Excel Data Input Method Toggle -----------------
+document.getElementById("dataInputMethod").addEventListener("change", e => {
+    const method = e.target.value;
+    document.getElementById("singleExcelDiv").classList.toggle("hidden", method !== "single");
+    document.getElementById("multipleExcelDiv").classList.toggle("hidden", method !== "multiple");
+});
+
+// ----------------- Excel (SINGLE) Upload -----------------
+document.getElementById("excelFile").addEventListener("change", e => {
+    if (document.getElementById("dataInputMethod").value !== "single") return;
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function (evt) {
+        try {
+            const data = evt.target.result;
+            const workbook = XLSX.read(data, { type: 'binary' });
+            const sheetName = workbook.SheetNames[0];
+            const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { header: 1 });
+            const headers = sheet[0].map(h => h.trim().replace(/\s/g, ''));
+            const dataObjects = sheet.slice(1).map(row => {
+                const obj = {};
+                headers.forEach((h, i) => { obj[h] = row[i]; });
+                return obj;
+            }).filter(obj => obj.Name);
+            setData("excelData", dataObjects);
+            renderExcel(dataObjects);
+            showToast("Data imported successfully!");
+        } catch (error) {
+            showToast("Error reading file! Check format.", 'error');
+            console.error("Excel Read Error:", error);
+        }
+    };
+    reader.readAsBinaryString(file);
+});
+
+// ----------------- Excel (MULTIPLE) Upload -----------------
+async function handleMultipleExcel() {
+    const files = document.getElementById("multipleExcelFiles").files;
+    if (!files.length) { showToast("Please select files!", 'error'); return; }
+    let columns = [];
+    let colNames = [];
+    for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        await new Promise(resolve => {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const d = new Uint8Array(e.target.result);
+                const wb = XLSX.read(d, { type: "array" });
+                const sheet = wb.Sheets[wb.SheetNames[0]];
+                const col = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+                if (col.length > 1) {
+                    colNames.push(col[0][0]);
+                    columns.push(col.slice(1).map(row => row[0]));
+                }
+                resolve();
+            };
+            reader.readAsArrayBuffer(file);
+        });
+    }
+    // Merge to objects
+    const numRows = Math.max(...columns.map(col => col.length));
+    const dataObjects = [];
+    for (let i = 0; i < numRows; i++) {
+        const obj = {};
+        for (let j = 0; j < columns.length; j++) {
+            obj[colNames[j]] = columns[j][i];
+        }
+        dataObjects.push(obj);
+    }
+    setData("excelData", dataObjects);
+    renderExcel(dataObjects);
+    showToast("Multiple columns imported!");
+}
+
+// ---- The rest of your original JavaScript goes here (multilanguage, summary, rendering, classes, teachers, students, assignment, charts, training, tab logic, etc).
+// ---- Please keep all the logic as you had in your original working dashboard, e.g. as in your first message in this thread.
+ const langData = {
             eng: {
                 teacher: "Teachers", student: "Students", dataMgmt: "Data Management", classes: "Classes",
                 teacherPlaceholder: "Enter Teacher Name", studentPlaceholder: "Enter Student Name", classPlaceholder: "Add Class",
                 add: "Add", selectClass: "-- Select Class --",
                 sendTeacher: "Send Notification to Teachers", sendStudent: "Send Notification to Students",
                 excelUpload: "Upload Excel File (Name, Class, Attendance, Fees, Marks)",
-                summaryTeachers: "Total Teachers", summaryStudents: "Total Students", summaryAttendance: "Avg. Attendance", 
+                summaryTeachers: "Total Teachers", summaryStudents: "Total Students", summaryAttendance: "Avg. Attendance",
                 summaryFees: "Avg. Fees Paid", summaryMarks: "Avg. Marks",
                 chartAttendance: "Attendance", chartFees: "Fees", chartMarks: "Marks", analyticsDashboard: "Analytics Dashboard",
                 assignmentTitle: "Teachers managing which classes:"
@@ -302,7 +354,7 @@
                 add: "जोड़ें", selectClass: "-- कक्षा चुनें --",
                 sendTeacher: "शिक्षकों को सूचना भेजें", sendStudent: "छात्रों को सूचना भेजें",
                 excelUpload: "एक्सेल फ़ाइल अपलोड करें (नाम, कक्षा, उपस्थिति, फीस, अंक)",
-                summaryTeachers: "कुल शिक्षक", summaryStudents: "कुल छात्र", summaryAttendance: "औसत उपस्थिति", 
+                summaryTeachers: "कुल शिक्षक", summaryStudents: "कुल छात्र", summaryAttendance: "औसत उपस्थिति",
                 summaryFees: "औसत फीस", summaryMarks: "औसत अंक",
                 chartAttendance: "उपस्थिति", chartFees: "फीस", chartMarks: "अंक", analyticsDashboard: "एनालिटिक्स डैशबोर्ड",
                 assignmentTitle: "शिक्षकों द्वारा प्रबंधित कक्षाएँ:"
@@ -313,7 +365,7 @@
                 add: "ಸೇರಿಸಿ", selectClass: "-- ವರ್ಗ ಆಯ್ಕೆಮಾಡಿ --",
                 sendTeacher: "ಶಿಕ್ಷಕರಿಗೆ ಸೂಚನೆ ಕಳುಹಿಸಿ", sendStudent: "ವಿದ್ಯಾರ್ಥಿಗಳಿಗೆ ಸೂಚನೆ ಕಳುಹಿಸಿ",
                 excelUpload: "ಎಕ್ಸೆಲ್ ಫೈಲ್ ಅಪ್ಲೋಡ್ ಮಾಡಿ (ಹೆಸರು, ತರಗತಿ, ಹಾಜರಿ, ಶುಲ್ಕ, ಅಂಕ)",
-                summaryTeachers: "ಒಟ್ಟು ಶಿಕ್ಷಕರು", summaryStudents: "ಒಟ್ಟು ವಿದ್ಯಾರ್ಥಿಗಳು", summaryAttendance: "ಸರಾಸರಿ ಹಾಜರಿ", 
+                summaryTeachers: "ಒಟ್ಟು ಶಿಕ್ಷಕರು", summaryStudents: "ಒಟ್ಟು ವಿದ್ಯಾರ್ಥಿಗಳು", summaryAttendance: "ಸರಾಸರಿ ಹಾಜರಿ",
                 summaryFees: "ಸರಾಸರಿ ಶುಲ್ಕ ಪಾವತಿ", summaryMarks: "ಸರಾಸರಿ ಅಂಕಗಳು",
                 chartAttendance: "ಹಾಜರಿ", chartFees: "ಶುಲ್ಕ", chartMarks: "ಅಂಕಗಳು", analyticsDashboard: "ಅನಾಲಿಟಿಕ್ಸ್ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್",
                 assignmentTitle: "ಶಿಕ್ಷಕರು ನಿರ್ವಹಿಸುವ ವರ್ಗಗಳು:"
@@ -324,18 +376,18 @@
                 add: "जोडा", selectClass: "-- वर्ग निवडा --",
                 sendTeacher: "शिक्षकांना सूचना पाठवा", sendStudent: "विद्यार्थ्यांना सूचना पाठवा",
                 excelUpload: "एक्सेल फाइल अपलोड करा (नाव, वर्ग, उपस्थिती, फी, गुण)",
-                summaryTeachers: "एकूण शिक्षक", summaryStudents: "एकूण विद्यार्थी", summaryAttendance: "सरासरी उपस्थिती", 
+                summaryTeachers: "एकूण शिक्षक", summaryStudents: "एकूण विद्यार्थी", summaryAttendance: "सरासरी उपस्थिती",
                 summaryFees: "सरासरी फी भरली", summaryMarks: "सरासरी गुण",
                 chartAttendance: "उपस्थिती", chartFees: "फी", chartMarks: "गुण", analyticsDashboard: "एनालिटिक्स डैशबोर्ड",
                 assignmentTitle: "शिक्षकांद्वारे व्यवस्थापित वर्ग:"
             }
         };
-        
+
         // --- Language Update Function (Unchanged) ---
         function updateLanguage() {
             const lang = document.getElementById("languageSelect").value;
             const data = langData[lang];
-            
+
             const updateWithIcon = (id, text, iconClass) => {
                 const element = document.getElementById(id);
                 if (element) { element.innerHTML = `<i class="${iconClass}"></i> ${text}`; }
@@ -343,7 +395,7 @@
 
             updateWithIcon("teacherHeader", data.teacher, "fas fa-chalkboard-teacher");
             document.getElementById("teacherAddBtnText").innerText = data.add;
-            
+
             updateWithIcon("studentHeader", data.student, "fas fa-user-graduate");
             document.getElementById("studentAddBtnText").innerText = data.add;
 
@@ -390,19 +442,19 @@
             return id.toUpperCase().replace(/[^A-Z0-9]/g, '_');
         }
 
-        function getData(key) { 
+        function getData(key) {
             const schoolId = getCurrentSchoolId();
-            return JSON.parse(localStorage.getItem(schoolId + "_" + key)) || []; 
+            return JSON.parse(localStorage.getItem(schoolId + "_" + key)) || [];
         }
 
-        function setData(key, data) { 
+        function setData(key, data) {
             const schoolId = getCurrentSchoolId();
-            localStorage.setItem(schoolId + "_" + key, JSON.stringify(data)); 
+            localStorage.setItem(schoolId + "_" + key, JSON.stringify(data));
         }
-        
+
         // Handle School ID Input Change
         document.getElementById("schoolIdInput").addEventListener("change", () => {
-            initDashboard(); 
+            initDashboard();
             showToast(`Switched to data for School ID: ${getCurrentSchoolId()}`);
         });
 
@@ -410,19 +462,19 @@
         async function trainNewModel() {
             const schoolId = getCurrentSchoolId();
             const referenceData = getData("excelData");
-            
+
             // Check for minimum data and required 'DropoutRisk' column
-            if (referenceData.length < 5) { 
+            if (referenceData.length < 5) {
                 showToast("Error: Need at least 5 rows of Excel data to train a model.", 'error');
                 return;
             }
-            
+
             const availableColumns = Object.keys(referenceData[0]);
             if (!availableColumns.includes("DropoutRisk")) {
                 showToast("Error: Excel data must contain a column named 'DropoutRisk' (1 or 0) for training.", 'error');
                 return;
             }
-            
+
             const trainButton = document.getElementById("trainModelBtn");
             trainButton.disabled = true;
             trainButton.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Training...`;
@@ -443,7 +495,7 @@
                 }
 
                 const result = await response.json();
-                
+
                 showToast(`Model for ${schoolId} trained successfully! Key: ${result.model_key}`);
                 setData("model_status", { key: result.model_key, trained_at: new Date().toISOString(), features: result.features });
 
@@ -463,7 +515,7 @@
             const classes = getData("classes");
             const teacherSelect = document.getElementById("teacherClassSelect");
             const studentSelect = document.getElementById("studentClassSelect");
-            
+
             // Clear existing options (except the first placeholder)
             teacherSelect.innerHTML = `<option value="">${langData[document.getElementById("languageSelect").value].selectClass}</option>`;
             studentSelect.innerHTML = `<option value="">${langData[document.getElementById("languageSelect").value].selectClass}</option>`;
@@ -489,7 +541,7 @@
             data.forEach((item, index) => {
                 const name = typeof item === 'object' ? item.name : item;
                 const assignedClass = typeof item === 'object' && item.class ? ` <span class="text-xs font-normal text-gray-400">(${item.class})</span>` : '';
-                
+
                 const li = document.createElement("li");
                 li.className = "flex justify-between items-center bg-gray-700 hover:bg-gray-600 px-3 py-2 rounded-lg list-item-animation";
                 li.innerHTML = `<span>${name}${assignedClass}</span>
@@ -515,11 +567,11 @@
             e.preventDefault();
             const inputName = document.getElementById("teacherName");
             const inputClass = document.getElementById("teacherClassSelect");
-            
+
             const teachers = getData("teachers");
             teachers.push({
                 name: inputName.value,
-                class: inputClass.value 
+                class: inputClass.value
             });
             setData("teachers", teachers);
             renderList("teachers", "teacherList");
@@ -564,7 +616,7 @@
         function showToast(message, type = 'success') {
             const container = document.getElementById("toastContainer");
             const toast = document.createElement("div");
-            const bgColor = type === 'error' ? 'bg-red-600' : 'bg-purple-600'; 
+            const bgColor = type === 'error' ? 'bg-red-600' : 'bg-purple-600';
             toast.className = `toast show ${bgColor}`;
             toast.innerText = message;
             container.appendChild(toast);
@@ -573,7 +625,7 @@
                 toast.addEventListener('transitionend', () => toast.remove());
             }, 3000);
         }
-        
+
         // --- Clear Data Function (Modified for School Isolation) ---
         function clearAllData() {
             const schoolId = getCurrentSchoolId();
@@ -584,9 +636,9 @@
                         localStorage.removeItem(key);
                     }
                 });
-                
+
                 // Re-render everything
-                initDashboard(); 
+                initDashboard();
                 document.getElementById("excelOutput").innerHTML = '';
                 updateCharts([]);
                 showToast(`All data cleared for ${schoolId}!`);
@@ -598,20 +650,20 @@
         function updateSummary(excelData = getData("excelData") || []) {
             document.getElementById("totalTeachers").innerText = getData("teachers").length;
             document.getElementById("totalStudents").innerText = getData("students").length;
-            
+
             if (excelData.length > 0) {
                 // Ensure values are numeric before summing
                 const attendance = excelData.reduce((sum, r) => sum + (parseFloat(r.Attendance) || 0), 0) / excelData.length;
                 const fees = excelData.reduce((sum, r) => sum + (parseFloat(r.Fees) || 0), 0) / excelData.length;
                 const marks = excelData.reduce((sum, r) => sum + (parseFloat(r.Marks) || 0), 0) / excelData.length;
-                
+
                 document.getElementById("avgAttendance").innerText = attendance.toFixed(1) + '%';
                 document.getElementById("avgFees").innerText = '₹ ' + fees.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 document.getElementById("avgMarks").innerText = marks.toFixed(1);
             } else {
-                 document.getElementById("avgAttendance").innerText = '0%';
-                 document.getElementById("avgFees").innerText = '₹ 0';
-                 document.getElementById("avgMarks").innerText = '0';
+                document.getElementById("avgAttendance").innerText = '0%';
+                document.getElementById("avgFees").innerText = '₹ 0';
+                document.getElementById("avgMarks").innerText = '0';
             }
         }
 
@@ -624,8 +676,8 @@
                     const data = evt.target.result;
                     const workbook = XLSX.read(data, { type: 'binary' });
                     const sheetName = workbook.SheetNames[0];
-                    const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { header: 1 }); 
-                    
+                    const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { header: 1 });
+
                     const headers = sheet[0].map(h => h.trim().replace(/\s/g, ''));
                     const dataObjects = sheet.slice(1).map(row => {
                         const obj = {};
@@ -652,7 +704,7 @@
                 container.innerHTML = "<p class='text-red-400'>Error: Imported data format is incorrect.</p>";
                 return;
             }
-            
+
             let html = "<table class='min-w-full text-xs border border-gray-600'>";
             html += "<thead><tr>";
             Object.keys(data[0]).forEach(h => { html += `<th class='border border-gray-600 px-3 py-1 bg-gray-700 text-left font-medium'>${h}</th>`; });
@@ -664,9 +716,9 @@
                 html += "</tr>";
             });
             html += "</tbody></table>";
-            
+
             if (data.length > 10) { html += `<p class="mt-2 text-sm text-gray-400">...showing 10 of ${data.length} rows</p>`; }
-            
+
             container.innerHTML = html;
             updateSummary(data);
             updateCharts(data);
@@ -680,8 +732,8 @@
             list.innerHTML = "";
 
             if (teachers.length === 0) {
-                 list.innerHTML = `<li class="text-gray-500">No teachers added yet.</li>`;
-                 return;
+                list.innerHTML = `<li class="text-gray-500">No teachers added yet.</li>`;
+                return;
             }
 
             const classMap = {};
@@ -699,7 +751,7 @@
                 list.appendChild(li);
             });
         }
-        
+
         // --- Chart Logic (Placeholders) ---
         let attendanceChart, feesChart, marksChart;
 
@@ -742,14 +794,14 @@
 
             if (attendanceChart) attendanceChart.destroy();
             attendanceChart = initializeChart(document.getElementById('attendanceChart'), 'Attendance', [attendance.toFixed(1)], 'rgba(251, 191, 36, 0.8)');
-            
+
             if (feesChart) feesChart.destroy();
             feesChart = initializeChart(document.getElementById('feesChart'), 'Fees', [fees.toFixed(0)], 'rgba(236, 72, 153, 0.8)');
 
             if (marksChart) marksChart.destroy();
             marksChart = initializeChart(document.getElementById('marksChart'), 'Marks', [marks.toFixed(1)], 'rgba(96, 165, 250, 0.8)');
         }
-        
+
         // --- Tab Logic (Unchanged) ---
         document.getElementById('tabExcel').addEventListener('click', () => switchTab('excelOutput', 'tabExcel'));
         document.getElementById('tabAssignments').addEventListener('click', () => switchTab('assignmentOutput', 'tabAssignments'));
@@ -765,7 +817,7 @@
             document.getElementById(tabId).classList.remove('border-transparent', 'text-gray-400', 'hover:text-white');
             document.getElementById(tabId).classList.add('border-purple-500', 'text-purple-400');
         }
-        
+
         // --- Initialisation Function ---
         function initDashboard() {
             renderList("teachers", "teacherList");
@@ -786,7 +838,8 @@
         document.getElementById('menuToggle').addEventListener('click', () => {
             document.getElementById('sidebar').classList.toggle('-translate-x-full');
         });
-        
-    </script>
+
+
+</script>
 </body>
 </html>

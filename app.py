@@ -3,8 +3,10 @@ import pandas as pd
 from sklearn.linear_model import LogisticRegression
 import joblib
 import os
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)  # Enable CORS for all routes
 
 @app.route('/train', methods=['POST'])
 def train():
@@ -16,7 +18,7 @@ def train():
     model = LogisticRegression(max_iter=1000)
     model.fit(df[feature_cols], df[target_col])
     joblib.dump({"model": model, "columns": feature_cols}, f"dropout_model_{school_id}.pkl")
-    return jsonify({"status": "success"})
+    return jsonify({"status": "success", "model_key": school_id, "features": feature_cols})
 
 @app.route('/predict', methods=['POST'])
 def predict():
